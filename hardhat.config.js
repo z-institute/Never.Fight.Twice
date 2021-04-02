@@ -34,7 +34,6 @@ task("fund-link", "Funds a contract with LINK")
   .addParam("contract", "The address of the contract that requires LINK")
   .addOptionalParam("linkAddress", "Set the LINK token address")
   .setAction(async taskArgs => {
-    console.log(linkAddress)
     const contractAddr = taskArgs.contract
     const networkId = network.name
     console.log("Funding contract ", contractAddr, " on network ", networkId)
@@ -57,6 +56,9 @@ task("fund-link", "Funds a contract with LINK")
       default: //default to kovan
         linkContractAddr = '0xa36085F69e2889c224210F603D836748e7dC0088'
     }
+
+    console.log(linkContractAddr)
+
     //Fund with 1 LINK token
     const amount = web3.utils.toHex(1e18)
 
@@ -204,19 +206,28 @@ const mainnetRpcUrl = process.env.ALCHEMY_MAINNET_RPC_URL || "https://eth-mainne
 const kovanRpcUrl = process.env.KOVAN_RPC_URL || "https://eth-kovan.alchemyapi.io/v2/your-api-key"
 const privateKey = process.env.PRIVATE_KEY || "your private key"
 module.exports = {
-  defaultNetwork: "hardhat",
+  defaultNetwork: "kovan",
   networks: {
     hardhat: {
-      // // If you want to do some forking, uncomment this
-      // forking: {
-      //   url: mainnetRpcUrl
-      // }
+      accounts: {
+        mnemonic: process.env.MNEMONIC,
+        initialIndex: 1 // cause chainlink hackathon account is the second one
+      }
+    },
+    rinkeby: {
+      url: process.env.RINKEBY_RPC_URL,
+      accounts: {
+        mnemonic: process.env.MNEMONIC,
+        initialIndex: 1 // cause chainlink hackathon account is the second one
+      }
     },
     kovan: {
-      url: kovanRpcUrl,
-      accounts: [privateKey],
-      saveDeployments: true
-    }
+      url: process.env.KOVAN_RPC_URL,
+      accounts: {
+        mnemonic: process.env.MNEMONIC,
+        initialIndex: 1 // cause chainlink hackathon account is the second one
+      }
+    },
   },
   namedAccounts: {
     deployer: {
