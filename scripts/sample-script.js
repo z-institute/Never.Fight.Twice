@@ -11,7 +11,7 @@ const LINK_TOKEN_ADDR="0xa36085F69e2889c224210F603D836748e7dC0088"
 const VRF_COORDINATOR="0xdD3782915140c8f3b190B5D67eAc6dc5760C46E9"
 const VRF_FEE="100000000000000000"
 const VRF_KEYHASH="0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4"
-const NeverFightTwiceAddr = "0xb85007C5ff7f475a762cAe9e6e69A1624e2c21E2"
+const LINK_TOKEN_ABI = [{ "inputs": [{ "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }], "name": "transfer", "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }], "stateMutability": "nonpayable", "type": "function" }]
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -30,6 +30,19 @@ async function main() {
   console.log("NeverFightTwice deployed to:", neverFightTwice.address);
 
   // npx hardhat fund-link --contract 
+  let contractAddr = neverFightTwice.address
+  //Fund with 1 LINK token
+  const amount = web3.utils.toHex(1e18)
+
+  //Get signer information
+  const accounts = await hre.ethers.getSigners()
+  const signer = accounts[0]
+
+  //Create connection to LINK token contract and initiate the transfer
+  const linkTokenContract = new ethers.Contract(LINK_TOKEN_ADDR, LINK_TOKEN_ABI, signer)
+  var result = await linkTokenContract.transfer(contractAddr, amount).then(function (transaction) {
+    console.log('Contract ', contractAddr, ' funded with 1 LINK. Transaction Hash: ', transaction.hash)
+  })
 }
 
 // We recommend this pattern to be able to use async/await everywhere
