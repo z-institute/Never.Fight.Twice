@@ -8,7 +8,8 @@ const hre = require("hardhat");
 //LINK Token address set to Kovan address. Can get other values at https://docs.chain.link/docs/link-token-contracts
 //VRF Details set for Kovan environment, can get other values at https://docs.chain.link/docs/vrf-contracts#config
 const LINK_TOKEN_ADDR="0xa36085F69e2889c224210F603D836748e7dC0088"
-const NeverFightTwice_ADDR="0x193c9bE4D9bb1d5dd7C79606015C2746a4cDa235"
+const NeverFightTwice_ADDR="0x502c4FcFF7f4Ee5791d27e064D29e5d29D6Ed88C"
+const NFTSimple_ADDR="0xA87DE27598B3Ff98d7C66a19eB68d4916f71C9a8"
 const VRF_COORDINATOR="0xdD3782915140c8f3b190B5D67eAc6dc5760C46E9"
 const VRF_FEE="100000000000000000"
 const VRF_KEYHASH="0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4"
@@ -24,11 +25,13 @@ async function main() {
 
   //Get signer information
   const accounts = await hre.ethers.getSigners()
-  const signer = accounts[0]
+  const alice = accounts[0]
+
+  console.log("Alice's address:", alice.address)
 
   // We get the contract to deploy
   const NeverFightTwice = await ethers.getContractFactory("NeverFightTwice");
-  const neverFightTwice = new ethers.Contract(NeverFightTwice_ADDR, NeverFightTwice.interface, signer);
+  const neverFightTwice = new ethers.Contract(NeverFightTwice_ADDR, NeverFightTwice.interface, alice);
   
   // const neverFightTwice = await NeverFightTwice.deploy(VRF_COORDINATOR, LINK_TOKEN_ADDR, VRF_KEYHASH);
   // await neverFightTwice.deployed();
@@ -39,7 +42,7 @@ async function main() {
   // npx hardhat fund-link --contract 
   // let contractAddr = NeverFightTwice_ADDR
   // const amount = web3.utils.toHex(1e18)
-  const linkTokenContract = new ethers.Contract(LINK_TOKEN_ADDR, LINK_TOKEN_ABI, signer)
+  const linkTokenContract = new ethers.Contract(LINK_TOKEN_ADDR, LINK_TOKEN_ABI, alice)
   // var result = await linkTokenContract.transfer(contractAddr, amount).then(function (transaction) {
   //   console.log('Contract funded with 1 LINK. Transaction Hash: ', transaction.hash)
   // })
@@ -47,6 +50,24 @@ async function main() {
   // check the link balance of the contract
   let balance = await linkTokenContract.balanceOf(neverFightTwice.address)
   console.log("Amount of LINK tokens in the contract:", ethers.utils.formatEther(balance));
+
+  // mint an NFT and send to Alice
+  const NFTSimple = await ethers.getContractFactory("NFTSimple");
+  const nftSimple = new ethers.Contract(NFTSimple_ADDR, NFTSimple.interface, alice);
+  
+  // const nftSimple = await NFTSimple.deploy();
+  // await nftSimple.deployed();
+  console.log("NFTSimple contract deployed at:", nftSimple.address);
+
+  await nftSimple.mint(alice.address, 2);
+  console.log("Number of NFT Alice has:", (await nftSimple.balanceOf(alice.address)).toNumber())
+
+  // Alice send the NFT to our contract 
+  await nftSimple.transferFrom(alice.address, neverFightTwice.address, 2)
+
+  console.log("Number of NFT Alice has after transfer:", (await nftSimple.balanceOf(alice.address)).toNumber())
+
+
 }
 
 // We recommend this pattern to be able to use async/await everywhere

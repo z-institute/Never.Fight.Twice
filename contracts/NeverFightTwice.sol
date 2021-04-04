@@ -28,6 +28,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
 
     event Win(address _better);
     event Lose(address _better);
+    event RecieveNFT(address _better, uint256 _tokenId);
 
     /**
      * Constructor inherits VRFConsumerBase
@@ -95,6 +96,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
     function onERC721Received(address, address _from, uint256 _tokenId, bytes memory) public virtual override returns (bytes4) {
         address _better = ERC721(_from).ownerOf(_tokenId);
         bet(_from, _better, _tokenId);
+        emit RecieveNFT(_better, _tokenId);
         return this.onERC721Received.selector;
     }  
 }
