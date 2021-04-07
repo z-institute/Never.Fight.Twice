@@ -5,17 +5,38 @@ require('dotenv').config()
 const RANDOM_SEED = 100
 
 describe('#bet', () => {
-    it('should deploy contract', async () => {
-        const NeverFightTwice = await ethers.getContractFactory("NeverFightTwice");
-        const neverFightTwice = await NeverFightTwice.deploy(process.env.VRFCoordinator, process.env.LinkToken, process.env.keyHash);
-    
-        await neverFightTwice.deployed();
+    // chainlink vrf setup
+    let neverFightTwice, vrfCoordinatorMock, nftSimple, seed, link, keyhash, fee, accounts, alice
+    beforeEach(async () => {
+        const MockLink = await ethers.getContractFactory("MockLink")
+        const NeverFightTwice = await ethers.getContractFactory("NeverFightTwice")
+        const NFTSimple = await ethers.getContractFactory("NFTSimple");
+        const VRFCoordinatorMock = await ethers.getContractFactory("VRFCoordinatorMock")
+        keyhash = '0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4'
+        fee = '1000000000000000000'
+        seed = 123
+        link = await MockLink.deploy()
+        vrfCoordinatorMock = await VRFCoordinatorMock.deploy(link.address)
+        neverFightTwice = await NeverFightTwice.deploy(vrfCoordinatorMock.address, link.address, keyhash)
+        nftSimple = await NFTSimple.deploy();
+        accounts = await hre.ethers.getSigners();
+        alice = accounts[0]
     })
 
     it('should send link to the deployed contract', async () => {
-        // expect(await greeter.greet()).to.equal("Hello, world!");
-        const LinkTokenContract = await ethers.getContractFactory("LinkTokenInterface");
-        let linkToken = await LinkTokenContract.at(process.env.LinkToken);
-        
+        await link.transfer(neverFightTwice.address, '2000000000000000000')
+       
+        // expect(randomNumber).to.equal(777)
+        let balance = await link.balanceOf(neverFightTwice.address)
+        console.log("Amount of LINK tokens in the contract:", ethers.utils.formatEther(balance));
     })
+
+
+    it('should deploy NFT contract and mint NFT', async () => {
+        await nftSimple.mint(alice.address, 0); // tokenId = 0
+
+        let nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
+        expect(nftNum).to.equal(1)
+    })
+
 })

@@ -206,7 +206,8 @@ const mainnetRpcUrl = process.env.ALCHEMY_MAINNET_RPC_URL || "https://eth-mainne
 const kovanRpcUrl = process.env.KOVAN_RPC_URL || "https://eth-kovan.alchemyapi.io/v2/your-api-key"
 const privateKey = process.env.PRIVATE_KEY || "your private key"
 module.exports = {
-  defaultNetwork: "kovan",
+  defaultNetwork: "hardhat",
+  // defaultNetwork: "kovan",
   networks: {
     hardhat: {
       accounts: {
