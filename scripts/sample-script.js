@@ -59,11 +59,11 @@ async function main() {
   // await nftSimple.deployed();
   console.log("NFTSimple contract deployed at:", nftSimple.address);
 
-  await nftSimple.mint(alice.address, 2);
+  await nftSimple.mint(alice.address, 4);
   console.log("Number of NFT Alice has:", (await nftSimple.balanceOf(alice.address)).toNumber())
 
   // Alice send the NFT to our contract 
-  await nftSimple.transferFrom(alice.address, neverFightTwice.address, 2)
+  await nftSimple.safeTransferFrom(alice.address, neverFightTwice.address, 4)
 
   console.log("Number of NFT Alice has after transfer:", (await nftSimple.balanceOf(alice.address)).toNumber())
 

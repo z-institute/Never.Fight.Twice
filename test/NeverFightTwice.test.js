@@ -45,8 +45,8 @@ describe('#bet', () => {
     it('should send NFT to NeverFightTwice', async () => {
         let tx = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
         let receipt = await tx.wait()
+        console.log(receipt.events)
         await expectEvent(receipt, 'Bet', { _better: alice.address, _NFTContract: nftSimple.address, _tokenId: 0 })
-        // expectEvent(receipt, 'Bet', { _better: alice.address, _NFTContract: nftSimple.address, _tokenId: 0 });
 
         let nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         expect(nftNum).to.equal(0)

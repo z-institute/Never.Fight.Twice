@@ -47,7 +47,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
 
     // before this, we need to send LINK tokens to this contract 
     function bet(address _NFTContract, address _better, uint256 _tokenId) 
-    internal returns (bytes32) {
+    public returns (bytes32) {
         bytes32 requestId = requestRandomness(keyHash, fee, betterToSeed[_better]); // requestRandomness is imported from VRFConsumerBase
         requestIdToNFT[requestId] = NFT(_better, _NFTContract, _tokenId);
 
@@ -96,9 +96,8 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
     }
 
     // _from: the ERC721 contract address
-    function onERC721Received(address, address _from, uint256 _tokenId, bytes memory) public virtual override returns (bytes4) {
-        address _better = ERC721(_from).ownerOf(_tokenId);
-        bet(_from, _better, _tokenId);
+    function onERC721Received(address, address _from, uint256 _tokenId, bytes memory) public override returns (bytes4) {
+        bet(_from, ERC721(_from).ownerOf(_tokenId), _tokenId);
         return this.onERC721Received.selector;
     }  
 }
