@@ -95,9 +95,10 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
         }
     }
 
-    // _from: the ERC721 contract address
-    function onERC721Received(address, address _from, uint256 _tokenId, bytes memory) public override returns (bytes4) {
-        bet(_from, ERC721(_from).ownerOf(_tokenId), _tokenId);
+    // @param _operator The address which called `safeTransferFrom` function
+    // @param _from The address which previously owned the token
+    function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes memory) public override returns (bytes4) {
+        bet(_operator, _from, _tokenId);
         return this.onERC721Received.selector;
     }  
 }
