@@ -14,6 +14,8 @@ npm install
 ```
 
 # Running the code
+1. Duplicate the `.env.example` file and rename it to `.env`
+2. Fill in the values in `.env`. You may need to go to https://infura.io/ to register an account and get your rpc url.
 1. Compile the contracts
 ```
 npx hardhat compile
