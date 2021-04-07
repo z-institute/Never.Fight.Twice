@@ -7,10 +7,12 @@ const RANDOM_SEED = 100
 describe('#bet', () => {
     // chainlink vrf setup
     let neverFightTwice, vrfCoordinatorMock, nftSimple, seed, link, keyhash, fee, accounts, alice
-    beforeEach(async () => {
+    // beforeEach(async () => {
+    it('deploy contracts and set variables', async () => {
         const MockLink = await ethers.getContractFactory("MockLink")
         const NeverFightTwice = await ethers.getContractFactory("NeverFightTwice")
         const NFTSimple = await ethers.getContractFactory("NFTSimple");
+        const ERC721 = await ethers.getContractFactory("ERC721");
         const VRFCoordinatorMock = await ethers.getContractFactory("VRFCoordinatorMock")
         keyhash = '0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4'
         fee = '1000000000000000000'
@@ -24,11 +26,12 @@ describe('#bet', () => {
     })
 
     it('should send link to the deployed contract', async () => {
-        await link.transfer(neverFightTwice.address, '2000000000000000000')
+        let amount = '2000000000000000000' // if this is a string it will overflow
+        await link.transfer(neverFightTwice.address, amount)
        
-        // expect(randomNumber).to.equal(777)
         let balance = await link.balanceOf(neverFightTwice.address)
-        console.log("Amount of LINK tokens in the contract:", ethers.utils.formatEther(balance));
+        expect(balance).to.equal(amount)
+        // console.log("Amount of LINK tokens in the contract:", ethers.utils.formatEther(balance));
     })
 
 
@@ -38,5 +41,20 @@ describe('#bet', () => {
         let nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         expect(nftNum).to.equal(1)
     })
+
+    it('should send NFT to NeverFightTwice', async () => {
+        let tx = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
+        let receipt = await tx.wait()
+        await expectEvent(receipt, 'Bet', { _better: alice.address, _NFTContract: nftSimple.address, _tokenId: 0 })
+        // expectEvent(receipt, 'Bet', { _better: alice.address, _NFTContract: nftSimple.address, _tokenId: 0 });
+
+        let nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
+        expect(nftNum).to.equal(0)
+
+        nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
+        expect(nftNum).to.equal(1)
+    })
+
+
 
 })
