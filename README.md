@@ -28,7 +28,7 @@ npx hardhat deploy
 ```
 4. Run the tests
 ```
-npx hardhat test
+npx hardhat test ./test/NeverFightTwice.test.js
 ```
 
 # Notes 
