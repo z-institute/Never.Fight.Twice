@@ -1,16 +1,19 @@
 const { expectRevert, expectEvent } = require('@openzeppelin/test-helpers')
 const { expect } = require("chai");
+const { assert } = require('console');
+const fs = require('fs');
+require("@nomiclabs/hardhat-web3") // web3
 require('dotenv').config()
 
 const RANDOM_SEED = 100
 
 describe('#bet', () => {
     // chainlink vrf setup
-    let neverFightTwice, vrfCoordinatorMock, nftSimple, seed, link, keyhash, fee, accounts, alice
+    let neverFightTwice, NeverFightTwice, vrfCoordinatorMock, nftSimple, seed, link, keyhash, fee, accounts, alice
     // beforeEach(async () => {
     it('deploy contracts and set variables', async () => {
         const MockLink = await ethers.getContractFactory("MockLink")
-        const NeverFightTwice = await ethers.getContractFactory("NeverFightTwice")
+        NeverFightTwice = await ethers.getContractFactory("NeverFightTwice")
         const NFTSimple = await ethers.getContractFactory("NFTSimple");
         const ERC721 = await ethers.getContractFactory("ERC721");
         const VRFCoordinatorMock = await ethers.getContractFactory("VRFCoordinatorMock")
@@ -43,10 +46,15 @@ describe('#bet', () => {
     })
 
     it('should send NFT to NeverFightTwice', async () => {
-        let tx = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
-        let receipt = await tx.wait()
-        console.log(receipt.events)
-        await expectEvent(receipt, 'Bet', { _better: alice.address, _NFTContract: nftSimple.address, _tokenId: 0 })
+        await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
+        // console.log(receipt.events)
+        const contract = JSON.parse(fs.readFileSync('artifacts/contracts/NeverFightTwice.sol/NeverFightTwice.json', 'utf8'));
+        let neverFightTwiceWeb3 = new web3.eth.Contract(contract.abi, neverFightTwice.address)
+        let events = await neverFightTwiceWeb3.getPastEvents('Bet')
+        expect(events[0].event).to.equal('Bet');
+        expect(events[0].returnValues._NFTContract).to.equal(nftSimple.address);
+        expect(events[0].returnValues._better).to.equal(alice.address);
+        expect(events[0].returnValues._tokenId).to.equal('0');
 
         let nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         expect(nftNum).to.equal(0)
@@ -54,6 +62,17 @@ describe('#bet', () => {
         nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
         expect(nftNum).to.equal(1)
     })
+
+    // var contrat=new web3.eth.Contract(
+
+    //     documentContrat.abi, 
+    
+    //     documentContrat
+    
+    //       .networks[initcontrat]
+    
+    //       .address
+    //   );
 
 
 
