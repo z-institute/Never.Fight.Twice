@@ -24,11 +24,11 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
     NFT[] public NFTs;
 
     mapping (bytes32 => NFT) requestIdToNFT;
-    mapping (address => uint256) betterToSeed;
+    // mapping (address => uint256) betterToSeed;
 
     event Win(address _better);
     event Lose(address _better);
-    event Bet(address _NFTContract, address _better, uint256 _tokenId);
+    event Bet(address _NFTContract, address _better, uint256 _tokenId, uint256 _seed);
 
     /**
      * Constructor inherits VRFConsumerBase
@@ -46,19 +46,19 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
     }
 
     // before this, we need to send LINK tokens to this contract 
-    function bet(address _NFTContract, address _better, uint256 _tokenId) 
+    function bet(address _NFTContract, address _better, uint256 _tokenId, uint256 _seed) 
     public returns (bytes32) {
-        bytes32 requestId = requestRandomness(keyHash, fee, betterToSeed[_better]); // requestRandomness is imported from VRFConsumerBase
+        bytes32 requestId = requestRandomness(keyHash, fee, _seed); // requestRandomness is imported from VRFConsumerBase
         requestIdToNFT[requestId] = NFT(_better, _NFTContract, _tokenId);
 
-        emit Bet(_NFTContract, _better, _tokenId);
+        emit Bet(_NFTContract, _better, _tokenId, _seed);
 
         return requestId;
     }
 
-    function setBetSeed(uint256 _seed) public {
-        betterToSeed[msg.sender] = _seed;
-    }
+    // function setBetSeed(uint256 _seed) public {
+    //     betterToSeed[msg.sender] = _seed;
+    // }
 
     // only the requested chainlink oracle can call this function
     function fulfillRandomness (bytes32 requestId, uint256 randomNumber)
@@ -99,9 +99,20 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
     // @param _from The address which previously owned the token
     // _operator = _from = _better in this case
     // msg.sender is the nft contract address
-    function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes memory) public override returns (bytes4) {
-        setBetSeed(uint256(msg.sender));
-        bet(msg.sender, _from, _tokenId);
+    function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes memory _data) public override returns (bytes4) {
+        // setBetSeed(uint256(_data));
+        bet(msg.sender, _from, _tokenId, sliceUint(_data, 0));
         return this.onERC721Received.selector;
     }  
+
+    function sliceUint(bytes memory bs, uint256 start)
+    internal pure
+    returns (uint256)
+    {
+        uint256 x;
+        assembly {
+            x := mload(add(bs, add(0x20, start)))
+        }
+        return x;
+    }
 }

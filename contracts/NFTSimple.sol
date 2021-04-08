@@ -15,7 +15,7 @@ contract NFTSimple is ERC721 {
         _safeMint(to, tokenId);
     }
 
-    function _safeTransferFrom(address from, address to, uint256 tokenId) public {
-        safeTransferFrom(from, to, tokenId);
+    function _safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public {
+        safeTransferFrom(from, to, tokenId, data);
     }
 }

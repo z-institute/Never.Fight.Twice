@@ -5,15 +5,23 @@ const fs = require('fs');
 require("@nomiclabs/hardhat-web3") // web3
 require('dotenv').config()
 
-const RANDOM_SEED = 100
+let neverFightTwice, neverFightTwiceWeb3, vrfCoordinatorMock, nftSimple, seed, link, keyhash, fee, accounts, alice
+
+async function checkBetEvent(_tokenId){
+    let events = await neverFightTwiceWeb3.getPastEvents('Bet')
+        expect(events[0].event).to.equal('Bet');
+        expect(events[0].returnValues._NFTContract).to.equal(nftSimple.address);
+        expect(events[0].returnValues._better).to.equal(alice.address);
+        expect(events[0].returnValues._tokenId).to.equal(_tokenId.toString());
+        expect(events[0].returnValues._seed).to.equal('55634480375741765769918871703393018226375812944819489753333136066302011506688');
+}
 
 describe('#bet', () => {
     // chainlink vrf setup
-    let neverFightTwice, NeverFightTwice, vrfCoordinatorMock, nftSimple, seed, link, keyhash, fee, accounts, alice
     // beforeEach(async () => {
     it('deploy contracts and set variables', async () => {
         const MockLink = await ethers.getContractFactory("MockLink")
-        NeverFightTwice = await ethers.getContractFactory("NeverFightTwice")
+        const NeverFightTwice = await ethers.getContractFactory("NeverFightTwice")
         const NFTSimple = await ethers.getContractFactory("NFTSimple");
         const ERC721 = await ethers.getContractFactory("ERC721");
         const VRFCoordinatorMock = await ethers.getContractFactory("VRFCoordinatorMock")
@@ -26,6 +34,9 @@ describe('#bet', () => {
         nftSimple = await NFTSimple.deploy();
         accounts = await hre.ethers.getSigners();
         alice = accounts[0];
+        const contract = JSON.parse(fs.readFileSync('artifacts/contracts/NeverFightTwice.sol/NeverFightTwice.json', 'utf8'));
+        neverFightTwiceWeb3 = new web3.eth.Contract(contract.abi, neverFightTwice.address)
+
         console.log("Alice",alice.address);
         console.log("Link",link.address);
         console.log("N.F.T",neverFightTwice.address);
@@ -55,20 +66,16 @@ describe('#bet', () => {
     })
 
     it('should send NFT to NeverFightTwice', async () => {
-        await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
+        await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0, 123) // tokenId = 0
         // console.log(receipt.events)
-        const contract = JSON.parse(fs.readFileSync('artifacts/contracts/NeverFightTwice.sol/NeverFightTwice.json', 'utf8'));
-        let neverFightTwiceWeb3 = new web3.eth.Contract(contract.abi, neverFightTwice.address)
-        let events = await neverFightTwiceWeb3.getPastEvents('Bet')
-        expect(events[0].event).to.equal('Bet');
-        expect(events[0].returnValues._NFTContract).to.equal(nftSimple.address);
-        expect(events[0].returnValues._better).to.equal(alice.address);
-        expect(events[0].returnValues._tokenId).to.equal('0');
+        await checkBetEvent(0)
+        
 
         // let tx0 = await nftSimple.transferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
-        let tx1 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 1) // tokenId = 1
-        let tx2 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 2) // tokenId = 2
-        let tx3 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 3) // tokenId = 3
+        let tx1 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 1, 123) // tokenId = 1
+        await checkBetEvent(1)
+        let tx2 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 2, 123) // tokenId = 2
+        let tx3 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 3, 123) // tokenId = 3
 
         // let receipt0 = await tx0.wait()
         let receipt1 = await tx1.wait()
