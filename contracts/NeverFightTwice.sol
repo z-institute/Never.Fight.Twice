@@ -28,7 +28,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
 
     event Win(address _better);
     event Lose(address _better);
-    event Bet(address _better, address _NFTContract, uint256 _tokenId);
+    event Bet(address _NFTContract, address _better, uint256 _tokenId);
 
     /**
      * Constructor inherits VRFConsumerBase
@@ -51,7 +51,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
         bytes32 requestId = requestRandomness(keyHash, fee, betterToSeed[_better]); // requestRandomness is imported from VRFConsumerBase
         requestIdToNFT[requestId] = NFT(_better, _NFTContract, _tokenId);
 
-        emit Bet(_better, _NFTContract, _tokenId);
+        emit Bet(_NFTContract, _better, _tokenId);
 
         return requestId;
     }
@@ -98,6 +98,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
     // @param _operator The address which called `safeTransferFrom` function
     // @param _from The address which previously owned the token
     function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes memory) public override returns (bytes4) {
+        setBetSeed(uint256(msg.sender));
         bet(_operator, _from, _tokenId);
         return this.onERC721Received.selector;
     }  

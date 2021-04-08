@@ -31,25 +31,27 @@ describe('#bet', () => {
        
         let balance = await link.balanceOf(neverFightTwice.address)
         expect(balance).to.equal(amount)
-        // console.log("Amount of LINK tokens in the contract:", ethers.utils.formatEther(balance));
+        console.log("Amount of LINK tokens in the contract:", ethers.utils.formatEther(balance));
     })
 
 
     it('should deploy NFT contract and mint NFT', async () => {
         await nftSimple.mint(alice.address, 0); // tokenId = 0
 
+        await nftSimple.mint(alice.address, 1); // tokenId = 1
+
         let nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
-        expect(nftNum).to.equal(1)
+        expect(nftNum).to.equal(2)
     })
 
     it('should send NFT to NeverFightTwice', async () => {
         let tx = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
         let receipt = await tx.wait()
         console.log(receipt.events)
-        await expectEvent(receipt, 'Bet', { _better: alice.address, _NFTContract: nftSimple.address, _tokenId: 0 })
+        await expectEvent(receipt, 'Bet', { _NFTContract: nftSimple.address, _better: alice.address, _tokenId: 0 })
 
         let nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
-        expect(nftNum).to.equal(0)
+        expect(nftNum).to.equal(1)
 
         nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
         expect(nftNum).to.equal(1)
