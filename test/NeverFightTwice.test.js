@@ -6,14 +6,29 @@ require("@nomiclabs/hardhat-web3") // web3
 require('dotenv').config()
 
 let neverFightTwice, neverFightTwiceWeb3, vrfCoordinatorMock, nftSimple, seed, link, keyhash, fee, accounts, alice
+const RANDOM_NUMBER_VRF = '777'
 
 async function checkBetEvent(_tokenId){
     let events = await neverFightTwiceWeb3.getPastEvents('Bet')
-        expect(events[0].event).to.equal('Bet');
-        expect(events[0].returnValues._NFTContract).to.equal(nftSimple.address);
-        expect(events[0].returnValues._better).to.equal(alice.address);
-        expect(events[0].returnValues._tokenId).to.equal(_tokenId.toString());
-        expect(events[0].returnValues._seed).to.equal('55634480375741765769918871703393018226375812944819489753333136066302011506688');
+    expect(events[0].event).to.equal('Bet');
+    expect(events[0].returnValues._NFTContract).to.equal(nftSimple.address);
+    expect(events[0].returnValues._better).to.equal(alice.address);
+    expect(events[0].returnValues._tokenId).to.equal(_tokenId.toString());
+    expect(events[0].returnValues._seed).to.equal('55634480375741765769918871703393018226375812944819489753333136066302011506688');
+
+    let requestId = events[0].returnValues.requestId
+    return requestId
+}
+
+async function checkWinLoseEvent(isWin, requestId){
+    let eventName = isWin? "Win": "Lose"
+    // let events = await neverFightTwiceWeb3.getPastEvents(eventName)
+    console.log(await neverFightTwiceWeb3.getPastEvents('allEvents'))
+    // console.log(await neverFightTwiceWeb3.getPastEvents('Lose'))
+    // expect(events[0].event).to.equal(eventName);
+    // expect(events[0].returnValues.requestId).to.equal(requestId);
+    // expect(events[0].returnValues._better).to.equal(alice.address);
+    // expect(events[0].returnValues.randomNumber).to.equal(RANDOM_NUMBER_VRF);
 }
 
 describe('#bet', () => {
@@ -67,13 +82,20 @@ describe('#bet', () => {
 
     it('should send NFT to NeverFightTwice', async () => {
         await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0, 123) // tokenId = 0
-        // console.log(receipt.events)
-        await checkBetEvent(0)
-        
+        let requestId = await checkBetEvent(0)
+
+        //Test the result of the random number request
+        let tx = await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF, neverFightTwice.address) 
+        let receipt = await tx.wait()
+        let randomNumber = await neverFightTwice.requestIdToRandomNumber(requestId)
+        console.log(randomNumber.toNumber())
+        // let receipt = await tx.wait()
+        // console.log(receipt)
+        // await checkWinLoseEvent(false, requestId)
 
         // let tx0 = await nftSimple.transferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
         let tx1 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 1, 123) // tokenId = 1
-        await checkBetEvent(1)
+        await checkBetEvent(1) // if the seed is the same then result is the same
         let tx2 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 2, 123) // tokenId = 2
         let tx3 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 3, 123) // tokenId = 3
 
@@ -102,18 +124,6 @@ describe('#bet', () => {
         console.log("owner of NFT O",owner)
         expect(owner).to.equal(neverFightTwice.address)
     })
-
-    // var contrat=new web3.eth.Contract(
-
-    //     documentContrat.abi, 
-    
-    //     documentContrat
-    
-    //       .networks[initcontrat]
-    
-    //       .address
-    //   );
-
 
 
 })

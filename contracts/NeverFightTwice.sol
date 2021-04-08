@@ -24,11 +24,12 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
     NFT[] public NFTs;
 
     mapping (bytes32 => NFT) requestIdToNFT;
+    mapping (bytes32 => uint256) public requestIdToRandomNumber;
     // mapping (address => uint256) betterToSeed;
 
-    event Win(address _better);
-    event Lose(address _better);
-    event Bet(address _NFTContract, address _better, uint256 _tokenId, uint256 _seed);
+    event Win(address _better, bytes32 requestId, uint256 randomNumber);
+    event Lose(address _better, bytes32 requestId, uint256 randomNumber);
+    event Bet(bytes32 requestId, address _NFTContract, address _better, uint256 _tokenId, uint256 _seed);
 
     /**
      * Constructor inherits VRFConsumerBase
@@ -51,7 +52,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
         bytes32 requestId = requestRandomness(keyHash, fee, _seed); // requestRandomness is imported from VRFConsumerBase
         requestIdToNFT[requestId] = NFT(_better, _NFTContract, _tokenId);
 
-        emit Bet(_NFTContract, _better, _tokenId, _seed);
+        emit Bet(requestId, _NFTContract, _better, _tokenId, _seed);
 
         return requestId;
     }
@@ -64,6 +65,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
     function fulfillRandomness (bytes32 requestId, uint256 randomNumber)
     internal override {
         NFT memory nft = requestIdToNFT[requestId];
+        requestIdToRandomNumber[requestId] = randomNumber;
 
         if(randomNumber.mod(2) == 0) {
             // bettwe lose all NFTs, save this NFT in our database 
@@ -74,7 +76,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
                     nft.tokenId
                 )
             );
-            emit Lose(nft.owner);
+            emit Lose(nft.owner, requestId, randomNumber);
         }
         else {
             // better win another k NFTs
@@ -91,7 +93,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
             
             ERC721(winningNFT.NFTcontract).safeTransferFrom(address(this), winningNFT.owner, winningNFT.tokenId);
 
-            emit Win(nft.owner);
+            emit Win(nft.owner, requestId, randomNumber);
         }
     }
 
