@@ -297,7 +297,7 @@ export class Dapp extends React.Component {
   // This method sends an ethereum transaction to transfer tokens.
   // While this action is specific to this application, it illustrates how to
   // send a transaction.
-  async _transferTokens(_tokenId, _seed) {
+  async _transferTokens(_seed, _tokenId) {
 
     try {
       // If a transaction fails, we save that error in the component's state.
@@ -313,7 +313,7 @@ export class Dapp extends React.Component {
       // this.setState({ txBeingSent: owner_0 });
       // console.log(owner_0)
       console.log(parseInt(_tokenId))
-      let tx = await this.nftSimple.approve(this.neverFightTwice.address, parseInt(_tokenId));
+      let tx = await this.nftSimple.approve(this.neverFightTwice.address, _tokenId);
       
       // let tx = await this.nftSimple._safeTransferFrom(this.state.selectedAddress, this.neverFightTwice.address, parseInt(_tokenId), [...Buffer.from(_seed)])
       this.setState({ txBeingSent: tx.hash });

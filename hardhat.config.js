@@ -214,7 +214,8 @@ module.exports = {
       accounts: {
         mnemonic: process.env.MNEMONIC,
         initialIndex: 1 // cause chainlink hackathon account is the second one
-      }
+      },
+      chainId: 1337
     },
     rinkeby: {
       url: process.env.RINKEBY_RPC_URL,
