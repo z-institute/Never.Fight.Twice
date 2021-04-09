@@ -17,6 +17,7 @@ async function checkBetEvent(_tokenId){
     expect(events[0].returnValues._seed).to.equal('55634480375741765769918871703393018226375812944819489753333136066302011506688');
 
     let requestId = events[0].returnValues.requestId
+    // console.log(events[0].returnValues)
     return requestId
 }
 
@@ -41,7 +42,7 @@ describe('#bet', () => {
         const ERC721 = await ethers.getContractFactory("ERC721");
         const VRFCoordinatorMock = await ethers.getContractFactory("VRFCoordinatorMock")
         keyhash = '0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4'
-        fee = '1000000000000000000'
+        // fee = '1000000000000000000'
         seed = 123
         link = await MockLink.deploy()
         vrfCoordinatorMock = await VRFCoordinatorMock.deploy(link.address)
@@ -81,17 +82,13 @@ describe('#bet', () => {
     })
 
     it('should send NFT to NeverFightTwice', async () => {
-        await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0, 123) // tokenId = 0
+        let tx = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0, 123) // tokenId = 0
         let requestId = await checkBetEvent(0)
 
         //Test the result of the random number request
-        let tx = await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF, neverFightTwice.address) 
-        let receipt = await tx.wait()
+        tx = await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF, neverFightTwice.address)
         let randomNumber = await neverFightTwice.requestIdToRandomNumber(requestId)
-        console.log(randomNumber.toNumber())
-        // let receipt = await tx.wait()
-        // console.log(receipt)
-        // await checkWinLoseEvent(false, requestId)
+        expect(randomNumber).to.equal(777)
 
         // let tx0 = await nftSimple.transferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
         let tx1 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 1, 123) // tokenId = 1

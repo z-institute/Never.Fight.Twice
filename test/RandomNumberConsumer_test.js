@@ -24,6 +24,7 @@ describe("RandomNumberConsumer", async function () {
     let requestId = tx_receipt.events[2].topics[0]
     //Test the result of the random number request
     let tx = await vrfCoordinatorMock.callBackWithRandomness(requestId, '777', randomNumberConsumer.address)
+    console.log(tx)
     let randomNumber = await randomNumberConsumer.randomResult()
     console.log("Random Number: ", randomNumber)
     expect(randomNumber).to.equal(777)
