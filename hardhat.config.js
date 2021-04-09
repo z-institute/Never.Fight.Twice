@@ -9,6 +9,7 @@ require("@nomiclabs/hardhat-web3")
 require("@nomiclabs/hardhat-truffle5")
 require("hardhat-deploy")
 require('dotenv').config()
+require("./tasks/faucet");
 
 
 task("accounts", "Prints the list of accounts", async () => {

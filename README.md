@@ -11,6 +11,7 @@ Send your NFT to the contract with your custom seed!
 ## How to win?
 If the VRF coordinator returns an odd number, and there is at least one NFT in the contract, the player wins. Otherwise, the player loses.
 
+
 ## Dev
 The contracts are in `/contracts` folder, named `NeverFightTwice.sol` and `NFTSimple.sol`. The scripts are under progress. Check `scripts/sample-script.js` to understand the working flow.
 
@@ -37,6 +38,19 @@ npx hardhat deploy
 4. Run the tests
 ```
 npx hardhat test ./test/NeverFightTwice.test.js
+```
+5. Run Hardhat's testing network and deploy contracts
+```
+npx hardhat node
+npx hardhat run scripts/deploy.js --network localhost
+
+```
+5. Import the private key of the first account into MetaMask and later connect wallet using this address.
+5. Run the frontend
+```
+cd frontend
+npm install
+npm start
 ```
 
 ## Notes 

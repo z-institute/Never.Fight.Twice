@@ -41,7 +41,6 @@ describe('#bet', () => {
         const MockLink = await ethers.getContractFactory("MockLink")
         const NeverFightTwice = await ethers.getContractFactory("NeverFightTwice")
         const NFTSimple = await ethers.getContractFactory("NFTSimple");
-        const ERC721 = await ethers.getContractFactory("ERC721");
         const VRFCoordinatorMock = await ethers.getContractFactory("VRFCoordinatorMock")
         keyhash = '0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4'
         // fee = '1000000000000000000'
@@ -73,7 +72,7 @@ describe('#bet', () => {
     })
 
 
-    it('should deploy NFT contract and mint NFT', async () => {
+    it('should mint NFT', async () => {
         await nftSimple.mint(alice.address, 0); // tokenId = 0
         await nftSimple.mint(alice.address, 1); // tokenId = 1
         await nftSimple.mint(alice.address, 2); // tokenId = 2
