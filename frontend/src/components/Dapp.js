@@ -21,8 +21,7 @@ import { Transfer } from "./Transfer";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
-
-
+import Axios from "axios"; // Import Axios or use Fetch.
 // This is the Hardhat Network id, you might change it in the hardhat.config.js
 // Here's a list of network ids https://docs.metamask.io/guide/ethereum-provider.html#properties
 // to use when deploying to other networks.
@@ -241,6 +240,7 @@ export class Dapp extends React.Component {
   async _intializeEthers() {
     // We first initialize ethers by creating a provider using window.ethereum
     this._provider = new ethers.providers.Web3Provider(window.ethereum);
+    // this.web3 = new Web3(this._provider);
 
     // When, we initialize the contract using that provider and the token's
     // artifact. You can do this same thing with your contracts.
@@ -249,8 +249,14 @@ export class Dapp extends React.Component {
     this.neverFightTwice = new ethers.Contract(contractAddress.NeverFightTwice,NeverFightTwiceArt.abi,this._provider.getSigner(0));
     this.nftSimple = new ethers.Contract(contractAddress.NFTSimple,NFTSimpleArt.abi,this._provider.getSigner(0));
     this.vrfCoordinatorMock = new ethers.Contract(contractAddress.VRFCoordinatorMock,VRFCoordinatorMockArt.abi,this._provider.getSigner(0));
-    const contract = JSON.parse(this.neverFightTwice.interface);
-    this.neverFightTwiceWeb3 = new this._provider.eth.Contract(contract.abi, this.neverFightTwice.address)
+    // const contract = JSON.parse(fs.readFileSync('artifacts/contracts/NeverFightTwice.sol/NeverFightTwice.json', 'utf8'));
+    Axios(NeverFightTwiceArt).then(res => {
+      const contract = JSON.parse(res.data)
+      this.neverFightTwiceWeb3 = new window.web3.eth.Contract(contract.abi, this.neverFightTwice.address)
+      console.log(this.neverFightTwiceWeb3.address)
+    });
+    // const contract = JSON.parse(neverFightTwiceContractFile);
+    // this.neverFightTwiceWeb3 = new this._provider.eth.Contract(contract.abi, this.neverFightTwice.address)
   }
 
   // The next to methods are needed to start and stop polling data. While
