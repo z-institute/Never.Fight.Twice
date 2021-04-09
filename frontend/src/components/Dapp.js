@@ -249,7 +249,8 @@ export class Dapp extends React.Component {
     this.neverFightTwice = new ethers.Contract(contractAddress.NeverFightTwice,NeverFightTwiceArt.abi,this._provider.getSigner(0));
     this.nftSimple = new ethers.Contract(contractAddress.NFTSimple,NFTSimpleArt.abi,this._provider.getSigner(0));
     this.vrfCoordinatorMock = new ethers.Contract(contractAddress.VRFCoordinatorMock,VRFCoordinatorMockArt.abi,this._provider.getSigner(0));
-    
+    const contract = JSON.parse(this.neverFightTwice.interface);
+    this.neverFightTwiceWeb3 = new this._provider.eth.Contract(contract.abi, this.neverFightTwice.address)
   }
 
   // The next to methods are needed to start and stop polling data. While
@@ -306,16 +307,8 @@ export class Dapp extends React.Component {
       this._dismissTransactionError();
 
       // We send the transaction, and save its hash in the Dapp's state. This
-      // way we can indicate that we are waiting for it to be mined.
-      // approve
-
-      // let owner_0 = await this.nftSimple.ownerOf(parseInt(_tokenId))
-      // this.setState({ txBeingSent: owner_0 });
-      // console.log(owner_0)
-      console.log(parseInt(_tokenId))
-      let tx = await this.nftSimple.approve(this.neverFightTwice.address, _tokenId);
-      
-      // let tx = await this.nftSimple._safeTransferFrom(this.state.selectedAddress, this.neverFightTwice.address, parseInt(_tokenId), [...Buffer.from(_seed)])
+      // way we can indicate that we are waiting for it to be mined.      
+      let tx = await this.nftSimple._safeTransferFrom(this.state.selectedAddress, this.neverFightTwice.address, parseInt(_tokenId), [...Buffer.from(_seed)])
       this.setState({ txBeingSent: tx.hash });
 
       // We use .wait() to wait for the transaction to be mined. This method
