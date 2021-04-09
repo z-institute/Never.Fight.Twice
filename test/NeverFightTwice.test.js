@@ -6,7 +6,8 @@ require("@nomiclabs/hardhat-web3") // web3
 require('dotenv').config()
 
 let neverFightTwice, neverFightTwiceWeb3, vrfCoordinatorMock, nftSimple, seed, link, keyhash, fee, accounts, alice
-const RANDOM_NUMBER_VRF = '777'
+const RANDOM_NUMBER_VRF_WIN = '777' // odd to win
+const RANDOM_NUMBER_VRF_LOSE = '778' // to lose
 
 async function checkBetEvent(_tokenId){
     let events = await neverFightTwiceWeb3.getPastEvents('Bet')
@@ -23,13 +24,14 @@ async function checkBetEvent(_tokenId){
 
 async function checkWinLoseEvent(isWin, requestId){
     let eventName = isWin? "Win": "Lose"
-    // let events = await neverFightTwiceWeb3.getPastEvents(eventName)
-    console.log(await neverFightTwiceWeb3.getPastEvents('allEvents'))
+    let RANDOM_NUMBER_VRF = isWin? RANDOM_NUMBER_VRF_WIN: RANDOM_NUMBER_VRF_LOSE
+    let events = await neverFightTwiceWeb3.getPastEvents(eventName)
+    // console.log(await neverFightTwiceWeb3.getPastEvents('allEvents'))
     // console.log(await neverFightTwiceWeb3.getPastEvents('Lose'))
-    // expect(events[0].event).to.equal(eventName);
-    // expect(events[0].returnValues.requestId).to.equal(requestId);
-    // expect(events[0].returnValues._better).to.equal(alice.address);
-    // expect(events[0].returnValues.randomNumber).to.equal(RANDOM_NUMBER_VRF);
+    expect(events[0].event).to.equal(eventName);
+    expect(events[0].returnValues.requestId).to.equal(requestId);
+    expect(events[0].returnValues._better).to.equal(alice.address);
+    expect(events[0].returnValues.randomNumber).to.equal(RANDOM_NUMBER_VRF);
 }
 
 describe('#bet', () => {
@@ -82,17 +84,23 @@ describe('#bet', () => {
     })
 
     it('should send NFT to NeverFightTwice', async () => {
-        let tx = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0, 123) // tokenId = 0
+        await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0, 123) // tokenId = 0
         let requestId = await checkBetEvent(0)
 
         //Test the result of the random number request
-        tx = await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF, neverFightTwice.address)
+        await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, neverFightTwice.address)
         let randomNumber = await neverFightTwice.requestIdToRandomNumber(requestId)
-        expect(randomNumber).to.equal(777)
+        expect(randomNumber).to.equal(RANDOM_NUMBER_VRF_LOSE)
+        await checkWinLoseEvent(false, requestId) // win if the random number is an odd number, BUT!! lose if there is no NFTs in the contract
 
         // let tx0 = await nftSimple.transferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
         let tx1 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 1, 123) // tokenId = 1
-        await checkBetEvent(1) // if the seed is the same then result is the same
+        requestId = await checkBetEvent(1) // if the seed is the same then result is the same
+        await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, neverFightTwice.address)
+        randomNumber = await neverFightTwice.requestIdToRandomNumber(requestId)
+        expect(randomNumber).to.equal(RANDOM_NUMBER_VRF_WIN)
+        await checkWinLoseEvent(true, requestId) // win cause there is NFT in the contract
+
         let tx2 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 2, 123) // tokenId = 2
         let tx3 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 3, 123) // tokenId = 3
 
@@ -110,16 +118,20 @@ describe('#bet', () => {
 
         let nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         console.log("balance Alice",nftNum)
-        expect(nftNum).to.equal(0)
+        expect(nftNum).to.equal(1)
 
         nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
         console.log("balance N.F.T", nftNum)
-        expect(nftNum).to.equal(4)
+        expect(nftNum).to.equal(3)
 
-        let owner = await nftSimple.ownerOf(0)
+        let owner_0 = await nftSimple.ownerOf(0)
+        let owner_1 = await nftSimple.ownerOf(1)
 
-        console.log("owner of NFT O",owner)
-        expect(owner).to.equal(neverFightTwice.address)
+        console.log("owner of NFT O",owner_0)
+        expect(owner_0).to.equal(neverFightTwice.address)
+
+        console.log("owner of NFT 1",owner_1)
+        expect(owner_1).to.equal(alice.address)
     })
 
 

@@ -64,37 +64,37 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
     // only the requested chainlink oracle can call this function
     function fulfillRandomness (bytes32 requestId, uint256 randomNumber)
     internal override {
-        // NFT memory nft = requestIdToNFT[requestId];
+        NFT memory nft = requestIdToNFT[requestId];
         requestIdToRandomNumber[requestId] = randomNumber;
 
-        // if(randomNumber.mod(2) == 0) {
-        //     // bettwe lose all NFTs, save this NFT in our database 
-        //     NFTs.push(
-        //         NFT(
-        //             address(this), // owner is this contract now
-        //             nft.NFTcontract,
-        //             nft.tokenId
-        //         )
-        //     );
-        //     emit Lose(nft.owner, requestId, randomNumber);
-        // }
-        // else {
-        //     // better win another k NFTs
-        //     // use the random number to find an NFT
-        //     // send the NFT to the better 
-        //     ERC721(nft.NFTcontract).safeTransferFrom(address(this), nft.owner, nft.tokenId);
+        if(randomNumber.mod(2) == 0 || NFTs.length == 0) {
+            // bettwe lose all NFTs, save this NFT in our database 
+            NFTs.push(
+                NFT(
+                    address(this), // owner is this contract now
+                    nft.NFTcontract,
+                    nft.tokenId
+                )
+            );
+            emit Lose(nft.owner, requestId, randomNumber);
+        }
+        else {
+            // better win another k NFTs
+            // use the random number to find an NFT
+            // send the NFT to the better 
+            ERC721(nft.NFTcontract).safeTransferFrom(address(this), nft.owner, nft.tokenId);
 
-        //     uint256 winningNFTId = randomNumber.mod(NFTs.length);
-        //     NFT memory winningNFT = NFTs[winningNFTId];
+            uint256 winningNFTId = randomNumber.mod(NFTs.length);
+            NFT memory winningNFT = NFTs[winningNFTId];
             
-        //     // remove element 
-        //     NFTs[winningNFTId] = NFTs[NFTs.length - 1]; // Move the last element into the place to delete
-        //     NFTs.pop(); // Remove the last element
+            // remove element 
+            NFTs[winningNFTId] = NFTs[NFTs.length - 1]; // Move the last element into the place to delete
+            NFTs.pop(); // Remove the last element
             
-        //     ERC721(winningNFT.NFTcontract).safeTransferFrom(address(this), winningNFT.owner, winningNFT.tokenId);
+            ERC721(winningNFT.NFTcontract).safeTransferFrom(address(this), winningNFT.owner, winningNFT.tokenId);
 
-        //     emit Win(nft.owner, requestId, randomNumber);
-        // }
+            emit Win(nft.owner, requestId, randomNumber);
+        }
     }
 
     // @param _operator The address which called `safeTransferFrom` function
