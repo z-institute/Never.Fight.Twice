@@ -22,6 +22,7 @@ import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
 
+
 // This is the Hardhat Network id, you might change it in the hardhat.config.js
 // Here's a list of network ids https://docs.metamask.io/guide/ethereum-provider.html#properties
 // to use when deploying to other networks.
@@ -243,6 +244,7 @@ export class Dapp extends React.Component {
 
     // When, we initialize the contract using that provider and the token's
     // artifact. You can do this same thing with your contracts.
+    // console.log(this._provider.getSigner(0).getAddress())
     this.link = new ethers.Contract(contractAddress.MockLink,MockLinkArt.abi,this._provider.getSigner(0));
     this.neverFightTwice = new ethers.Contract(contractAddress.NeverFightTwice,NeverFightTwiceArt.abi,this._provider.getSigner(0));
     this.nftSimple = new ethers.Contract(contractAddress.NFTSimple,NFTSimpleArt.abi,this._provider.getSigner(0));
@@ -305,7 +307,15 @@ export class Dapp extends React.Component {
 
       // We send the transaction, and save its hash in the Dapp's state. This
       // way we can indicate that we are waiting for it to be mined.
-      const tx = await this.nftSimple._safeTransferFrom(this.state.selectedAddress, this.neverFightTwice.address, _tokenId, _seed) 
+      // approve
+
+      // let owner_0 = await this.nftSimple.ownerOf(parseInt(_tokenId))
+      // this.setState({ txBeingSent: owner_0 });
+      // console.log(owner_0)
+      console.log(parseInt(_tokenId))
+      let tx = await this.nftSimple.approve(this.neverFightTwice.address, parseInt(_tokenId));
+      
+      // let tx = await this.nftSimple._safeTransferFrom(this.state.selectedAddress, this.neverFightTwice.address, parseInt(_tokenId), [...Buffer.from(_seed)])
       this.setState({ txBeingSent: tx.hash });
 
       // We use .wait() to wait for the transaction to be mined. This method

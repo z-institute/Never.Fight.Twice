@@ -2,7 +2,8 @@ const fs = require('fs');
 require("@nomiclabs/hardhat-web3") // web3
 require('dotenv').config()
 
-let neverFightTwice, neverFightTwiceWeb3, vrfCoordinatorMock, nftSimple, seed, link, keyhash, fee, accounts, alice
+
+let neverFightTwice, neverFightTwiceWeb3, vrfCoordinatorMock, nftSimple, seed, link, keyhash, accounts, alice
 const RANDOM_NUMBER_VRF_WIN = '777' // odd to win
 const RANDOM_NUMBER_VRF_LOSE = '778' // to lose
 
@@ -60,6 +61,13 @@ async function main() {
   await nftSimple.mint(alice.address, 1); // tokenId = 1
   await nftSimple.mint(alice.address, 2); // tokenId = 2
   await nftSimple.mint(alice.address, 3); // tokenId = 3
+
+  let owner_0 = await nftSimple.ownerOf(0)
+  let owner_1 = await nftSimple.ownerOf(1)
+  let owner_2 = await nftSimple.ownerOf(2)
+  let owner_3 = await nftSimple.ownerOf(3)
+  console.log("All NFTs belong to", owner_0, owner_1, owner_2, owner_3)
+
 }
 
 function saveFrontendFiles() {
