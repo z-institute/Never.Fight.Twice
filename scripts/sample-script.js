@@ -58,8 +58,10 @@ async function main() {
   // const nftSimple = await NFTSimple.deploy();
   // await nftSimple.deployed();
   console.log("NFTSimple contract deployed at:", nftSimple.address);
-
-  let nftNumber = 120
+  
+  let nftNumber = //id to mint
+  await nftSimple.mint(alice.address, nftNumber)
+  console.log("NFT minted, id:", nftNumber);
   //await nftSimple.mint(alice.address, nftNumber);
   console.log("Number of NFT Alice has:", (await nftSimple.balanceOf(alice.address)).toNumber())
 
