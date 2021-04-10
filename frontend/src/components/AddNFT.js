@@ -68,10 +68,10 @@ export function AddNFT({ NFTs, transferTokens }) {
         />}
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
-          {NFT.nftContractName}
+          {NFT.nftContractName} 
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
-          {NFT.name}
+          {NFT.name} (tokenId: {NFT.tokenId})
           </Typography>
         </CardContent>
       </CardActionArea>
