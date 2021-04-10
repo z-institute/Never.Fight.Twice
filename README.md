@@ -31,40 +31,33 @@ npm install
 ## Running the code
 1. Duplicate the `.env.example` file and rename it to `.env`
 2. Fill in the values in `.env`. You may need to go to https://infura.io/ to register an account and get your rpc url.
-3. Compile the contracts
-```
-npx hardhat compile
-```
-4. Run the scripts
-```
-npx hardhat run scripts/sample-script.js
-```
-5. Deploy the contracts 
-```
-npx hardhat deploy
-```
-6. Run the tests
-```
-npx hardhat test ./test/NeverFightTwice.test.js
-```
-7. Run Hardhat's testing network (if you reset the local network, remember to reset account in MetaMask > Settings > Advanced > Reset Account! Otherwise you will have nonce problem)
-```
-npx hardhat node
-```
-8. Deploy contracts (remember to `npx hardhat compile` if u change the contracts)
-```
-npx hardhat run scripts/deploy.js --network localhost
-// npx hardhat run scripts/deploy_rinkeby.js --network rinkeby
-// npx hardhat run scripts/deploy_kovan.js --network kovan
-```
-9. Import the private key of the first account into MetaMask and later connect wallet using this address.
-10. Run the frontend
+4. Run the frontend
 ```
 cd frontend
 npm install
 npm start
 ```
-11. Verify the contracts
+
+## If you wanna run the code on local network or deploy yourself
+1. Compile the contracts
+```
+npx hardhat compile
+```
+2. Run the tests
+```
+npx hardhat test ./test/NeverFightTwice.test.js
+```
+3. Run Hardhat's testing network (if you reset the local network, remember to reset account in MetaMask > Settings > Advanced > Reset Account! Otherwise you will have nonce problem)
+```
+npx hardhat node
+```
+4. Deploy contracts (remember to `npx hardhat compile` if u change the contracts)
+```
+npx hardhat run scripts/deploy.js --network localhost
+// npx hardhat run scripts/deploy_rinkeby.js --network rinkeby
+// npx hardhat run scripts/deploy_kovan.js --network kovan
+```
+5. Verify the contracts
 ```
 // NeverFightTwice
 npx hardhat verify --network rinkeby 0x0cE4C9201471222B26bf6039A0ecfdba02D1C9D4 0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B 0x01be23585060835e02b77ef475b0cc51aa1e0709 0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311
@@ -74,7 +67,15 @@ npx hardhat verify --network rinkeby 0x193c9bE4D9bb1d5dd7C79606015C2746a4cDa235
 
 // npx hardhat verify --network rinkeby DEPLOYED_CONTRACT_ADDRESS "Constructor argument 1" "Constructor argument 2"
 ```
-12. Send LINK to NeverFightTwice contract!
+6. Send LINK to NeverFightTwice contract!
+7. Import the private key of the first account into MetaMask and later connect wallet using this address.
+8. Run the frontend
+```
+cd frontend
+npm install
+npm start
+```
 
 ## Notes 
 This project is modified from https://github.com/pappas999/chainlink-hardhat-box
+
