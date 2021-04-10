@@ -52,7 +52,7 @@ export function AddNFT({ NFTs, transferTokens }) {
     <div className="col-2" key={i}>
       <Card className={classes.root}>
       <CardActionArea>
-      {NFT.thumbnail.slice(-3) === 'mp4'?  
+      {NFT.thumbnail && NFT.thumbnail.slice(-3) === 'mp4'?  
         <CardMedia
           component='video'
           className={classes.media}

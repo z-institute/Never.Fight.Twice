@@ -23,8 +23,8 @@ import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
 import { AddNFT } from "./AddNFT";
 const HARDHAT_NETWORK_ID = '1337';
-const NeverFightTwiceAddr = '0x2DC272108F86832b59eb46ecfD5c117601d6b58e';
-const NFTSimpleAddr = '0xB40698744C409069e3dbC90172dB91EDa0D02ac1';
+const NeverFightTwiceAddr = '0x0cE4C9201471222B26bf6039A0ecfdba02D1C9D4';
+const NFTSimpleAddr = '0x193c9bE4D9bb1d5dd7C79606015C2746a4cDa235';
 const options = {method: 'GET'};
 
 // This is an error code that indicates that the user canceled a transaction
@@ -241,7 +241,8 @@ export class Dapp extends React.Component {
 
     // TODO: get all NFTs
     this.NFTs = []
-    let response = await fetch(`https://api.opensea.io/api/v1/assets?owner=${userAddress}&order_direction=desc&offset=0&limit=20`, options);
+    // let response = await fetch(`https://api.opensea.io/api/v1/assets?owner=${userAddress}&order_direction=desc&offset=0&limit=20`, options);
+    let response = await fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${userAddress}&order_direction=desc&offset=0&limit=20`, options);
     let commits = await response.json();
     // console.log(commits.assets)
     let NFTs = []
@@ -501,16 +502,16 @@ export class Dapp extends React.Component {
   }
 
   // This method checks if Metamask selected network is Localhost:8545 
-  _checkNetwork() {
-    if (window.ethereum.networkVersion === HARDHAT_NETWORK_ID || window.ethereum.networkVersion === '42') { // kovan
-      return true;
-    }
-    console.log(window.ethereum.networkVersion, HARDHAT_NETWORK_ID)
+  // _checkNetwork() {
+  //   if (window.ethereum.networkVersion === HARDHAT_NETWORK_ID || window.ethereum.networkVersion === '42') { // kovan
+  //     return true;
+  //   }
+  //   console.log(window.ethereum.networkVersion, HARDHAT_NETWORK_ID)
 
-    this.setState({ 
-      networkError: 'Please connect Metamask to Localhost:8545'
-    });
+  //   this.setState({ 
+  //     networkError: 'Please connect Metamask to Localhost:8545'
+  //   });
 
-    return false;
-  }
+  //   return false;
+  // }
 }

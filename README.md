@@ -77,6 +77,7 @@ npx hardhat verify --network rinkeby 0x193c9bE4D9bb1d5dd7C79606015C2746a4cDa235
 // npx hardhat verify --network rinkeby DEPLOYED_CONTRACT_ADDRESS "Constructor argument 1" "Constructor argument 2"
 
 ```
+7. Send LINK to NeverFightTwice contract!
 
 ## Notes 
 This project is modified from https://github.com/pappas999/chainlink-hardhat-box
