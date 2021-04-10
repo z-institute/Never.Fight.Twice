@@ -113,6 +113,25 @@ describe('#bet', () => {
         console.log("balance N.F.T", nftNum)
         expect(nftNum).to.equal(1)
     })
+
+    it('check all owners', async () => {
+        let owner_0 = await nftSimple.ownerOf(0)
+        let owner_1 = await nftSimple.ownerOf(1)
+        let owner_2 = await nftSimple.ownerOf(2)
+        let owner_3 = await nftSimple.ownerOf(3)
+
+        expect(owner_0).to.equal(neverFightTwice.address)
+        console.log("owner of NFT O is NeverFightTwice")
+
+        expect(owner_1).to.equal(alice.address)
+        console.log("owner of NFT 1 is Alice")
+
+        expect(owner_2).to.equal(alice.address)
+        console.log("owner of NFT 2 is Alice")
+
+        expect(owner_3).to.equal(alice.address)
+        console.log("owner of NFT 3 is Alice")
+    })
         it('should win', async () => {
 
         // let tx0 = await nftSimple.transferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
@@ -159,6 +178,25 @@ describe('#bet', () => {
 
     })
 
+    it('check all owners', async () => {
+        let owner_0 = await nftSimple.ownerOf(0)
+        let owner_1 = await nftSimple.ownerOf(1)
+        let owner_2 = await nftSimple.ownerOf(2)
+        let owner_3 = await nftSimple.ownerOf(3)
+
+        expect(owner_0).to.equal(alice.address)
+        console.log("owner of NFT O is Alice")
+
+        expect(owner_1).to.equal(alice.address)
+        console.log("owner of NFT 1 is Alice")
+
+        expect(owner_2).to.equal(neverFightTwice.address)
+        console.log("owner of NFT 2 is NeverFightTwice")
+
+        expect(owner_3).to.equal(alice.address)
+        console.log("owner of NFT 3 is Alice")
+    })
+
     it('should lose', async () => {
         let tx = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 3, 123) // tokenId = 3
         receipt = await tx.wait()
@@ -189,6 +227,25 @@ describe('#bet', () => {
         // expect(owner_1).to.equal(alice.address)
     })
 
+    it('check all owners', async () => {
+        let owner_0 = await nftSimple.ownerOf(0)
+        let owner_1 = await nftSimple.ownerOf(1)
+        let owner_2 = await nftSimple.ownerOf(2)
+        let owner_3 = await nftSimple.ownerOf(3)
+
+        expect(owner_0).to.equal(alice.address)
+        console.log("owner of NFT O is Alice")
+
+        expect(owner_1).to.equal(alice.address)
+        console.log("owner of NFT 1 is Alice")
+
+        expect(owner_2).to.equal(neverFightTwice.address)
+        console.log("owner of NFT 2 is NeverFightTwice")
+
+        expect(owner_3).to.equal(neverFightTwice.address)
+        console.log("owner of NFT 3 is NeverFightTwice")
+    })
+
     it('should win', async () => {
 
         // let tx0 = await nftSimple.transferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
@@ -209,6 +266,108 @@ describe('#bet', () => {
         nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
         console.log("balance N.F.T", nftNum)
         expect(nftNum).to.equal(1)
+    })
+
+    it('check all owners', async () => {
+        let owner_0 = await nftSimple.ownerOf(0)
+        let owner_1 = await nftSimple.ownerOf(1)
+        let owner_2 = await nftSimple.ownerOf(2)
+        let owner_3 = await nftSimple.ownerOf(3)
+
+        expect(owner_0).to.equal(alice.address)
+        console.log("owner of NFT O is Alice")
+
+        expect(owner_1).to.equal(alice.address)
+        console.log("owner of NFT 1 is Alice")
+
+        expect(owner_2).to.equal(alice.address)
+        console.log("owner of NFT 2 is Alice")
+
+        expect(owner_3).to.equal(neverFightTwice.address)
+        console.log("owner of NFT 3 is NeverFightTwice")
+    })
+
+    it('should lose', async () => {
+
+        // let tx0 = await nftSimple.transferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
+        let tx = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 1, 123) // tokenId = 1
+        receipt = await tx.wait()
+        requestId = receipt.events[5].data.substring(0,66)
+        await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, neverFightTwice.address)
+        randomNumber = await neverFightTwice.requestIdToRandomNumber(requestId)
+        expect(randomNumber).to.equal(RANDOM_NUMBER_VRF_LOSE)
+        await checkWinLoseEvent(false, requestId, RANDOM_NUMBER_VRF_LOSE) // win cause there is NFT in the contract
+        arrLength = await neverFightTwice.NFTsLen()
+        expect(arrLength).to.equal(2)
+
+        nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
+        console.log("balance Alice",nftNum)
+        expect(nftNum).to.equal(2)
+
+        nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
+        console.log("balance N.F.T", nftNum)
+        expect(nftNum).to.equal(2)
+    })
+    it('should lose', async () => {
+
+        let tx = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 2, 123) // tokenId = 2
+        receipt = await tx.wait()
+        requestId = receipt.events[5].data.substring(0,66)
+        await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, neverFightTwice.address)
+        randomNumber = await neverFightTwice.requestIdToRandomNumber(requestId)
+        expect(randomNumber).to.equal(RANDOM_NUMBER_VRF_LOSE)
+        await checkWinLoseEvent(false, requestId, RANDOM_NUMBER_VRF_LOSE) // win cause there is NFT in the contract
+        arrLength = await neverFightTwice.NFTsLen()
+        expect(arrLength).to.equal(3)
+
+        nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
+        console.log("balance Alice",nftNum)
+        expect(nftNum).to.equal(1)
+
+        nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
+        console.log("balance N.F.T", nftNum)
+        expect(nftNum).to.equal(3)
+    })
+
+    
+    it('check all owners', async () => {
+        let owner_0 = await nftSimple.ownerOf(0)
+        let owner_1 = await nftSimple.ownerOf(1)
+        let owner_2 = await nftSimple.ownerOf(2)
+        let owner_3 = await nftSimple.ownerOf(3)
+
+        expect(owner_0).to.equal(alice.address)
+        console.log("owner of NFT O is Alice")
+
+        expect(owner_1).to.equal(neverFightTwice.address)
+        console.log("owner of NFT 1 is NeverFightTwice")
+
+        expect(owner_2).to.equal(neverFightTwice.address)
+        console.log("owner of NFT 2 is NeverFightTwice")
+
+        expect(owner_3).to.equal(neverFightTwice.address)
+        console.log("owner of NFT 3 is NeverFightTwice")
+    })
+
+    it('should lose', async () => {
+
+        let tx = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0, 123) // tokenId = 0
+        receipt = await tx.wait()
+        requestId = receipt.events[5].data.substring(0,66)
+        await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, neverFightTwice.address)
+        randomNumber = await neverFightTwice.requestIdToRandomNumber(requestId)
+        expect(randomNumber).to.equal(RANDOM_NUMBER_VRF_LOSE)
+        await checkWinLoseEvent(false, requestId, RANDOM_NUMBER_VRF_LOSE) // win cause there is NFT in the contract
+        arrLength = await neverFightTwice.NFTsLen()
+        expect(arrLength).to.equal(4)
+
+        nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
+        console.log("balance Alice",nftNum)
+        expect(nftNum).to.equal(0)
+
+        nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
+        console.log("balance N.F.T", nftNum)
+        expect(nftNum).to.equal(4)
     })
 
 
