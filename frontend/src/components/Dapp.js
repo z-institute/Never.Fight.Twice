@@ -100,7 +100,8 @@ export class Dapp extends React.Component {
         <div className="row">
           <div className="col-12">
             <h1>
-              {this.state.tokenData.name} ({this.state.tokenData.symbol})
+              {/* {this.state.tokenData.name} ({this.state.tokenData.symbol}) */}
+              Never Fight Twice!
             </h1>
             <p>
               Welcome <b>{this.state.selectedAddress}</b>, you have{" "}
@@ -329,6 +330,7 @@ export class Dapp extends React.Component {
       account: this.neverFightTwice.address
     })
     this.setState({ balance: balance,  balanceNeverFightTwice: balanceNeverFightTwice, tokenIds: tokenIds, tokenIdsNeverFightTwice: tokenIdsNeverFightTwice});
+    console.log('updated balance')
   }
 
   async listTokensOfOwner({ token: tokenAddress, account }) {
