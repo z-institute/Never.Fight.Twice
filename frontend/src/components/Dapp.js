@@ -16,6 +16,7 @@ import contractAddress from "../contracts/contract-address.json";
 import { NoWalletDetected } from "./NoWalletDetected";
 import { ConnectWallet } from "./ConnectWallet";
 import { Loading } from "./Loading";
+import { Mint} from "./Mint"
 import { Transfer } from "./Transfer";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
@@ -138,6 +139,24 @@ export class Dapp extends React.Component {
               <TransactionErrorMessage
                 message={this._getRpcErrorMessage(this.state.transactionError)}
                 dismiss={() => this._dismissTransactionError()}
+              />
+            )}
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-12">
+
+            {/*
+              This component displays a form that the user can use to send a 
+              mint
+            */}
+            {(
+              <Mint
+                mint={(tokenId) =>
+                  this._mint(tokenId)
+                }
+                tokenSymbol={this.state.tokenData.symbol}
               />
             )}
           </div>
@@ -329,6 +348,59 @@ export class Dapp extends React.Component {
       })
 
       let tx = await this.nftSimple._safeTransferFrom(this.state.selectedAddress, this.neverFightTwice.address, parseInt(_tokenId), [...Buffer.from(_seed)])
+      console.log("transaction sent")
+      this.setState({ txBeingSent: tx.hash });
+      let receipt = await tx.wait()
+      // let requestId = receipt.events[5].data.substring(0,66)
+      
+      if (receipt.status === 0) {
+        throw new Error("Transaction failed");
+      }
+
+      // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, this.neverFightTwice.address)
+      // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, this.neverFightTwice.address)
+      // let randomNumber = await this.neverFightTwice.requestIdToRandomNumber(requestId)
+      // let randomNumber = await this.neverFightTwice.getRandomNumberFromRequestId(requestId)
+      // console.log(randomNumber.toNumber())
+
+      await this._updateBalance();
+
+    } catch (error) {
+      // We check the error code to see if this error was produced because the
+      // user rejected a tx. If that's the case, we do nothing.
+      if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
+        return;
+      }
+
+      // Other errors are logged and stored in the Dapp's state. This is used to
+      // show them to the user, and for debugging.
+      console.error(error);
+      this.setState({ transactionError: error });
+    } finally {
+      // If we leave the try/catch, we aren't sending a tx anymore, so we clear
+      // this part of the state.
+      this.setState({ txBeingSent: undefined });
+    }
+  }
+
+  // This method sends an ethereum transaction to mint a NFT.
+  // While this action is specific to this application, it illustrates how to
+  // send a transaction.
+  async _mint(_tokenId) {
+
+    try {
+      // If a transaction fails, we save that error in the component's state.
+      // We only save one such error, so before sending a second transaction, we
+      // clear it.
+      this._dismissTransactionError();
+
+      // We send the transaction, and save its hash in the Dapp's state. This
+      // way we can indicate that we are waiting for it to be mined.      
+      this._provider._addEventListener("Mint", function(){
+        console.log("mint  event found");
+      })
+
+      let tx = await this.nftSimple.safeMint(this.state.selectedAddress, parseInt(_tokenId))
       console.log("transaction sent")
       this.setState({ txBeingSent: tx.hash });
       let receipt = await tx.wait()
