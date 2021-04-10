@@ -83,3 +83,10 @@ npm start
 ## Notes 
 This project is modified from https://github.com/pappas999/chainlink-hardhat-box
 
+## TODO
+- Show Win / Lose result after bet
+- Batch Mint NFT
+- Integrate IPFS
+- Generate random pixel images when mint 
+- See how opensea api can speed up to update the NFT balance after mint
+- Display which tokenId has been used and which is not 

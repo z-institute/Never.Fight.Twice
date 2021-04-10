@@ -25,7 +25,7 @@ import { AddNFT } from "./AddNFT";
 const HARDHAT_NETWORK_ID = '1337';
 const NeverFightTwiceAddr = '0x0cE4C9201471222B26bf6039A0ecfdba02D1C9D4';
 const NFTSimpleAddr = '0x193c9bE4D9bb1d5dd7C79606015C2746a4cDa235';
-const options = {method: 'GET'};
+const options = {method: 'GET', cache: "no-store"};
 
 // This is an error code that indicates that the user canceled a transaction
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
@@ -103,7 +103,7 @@ export class Dapp extends React.Component {
               {/* {this.state.tokenData.name} ({this.state.tokenData.symbol}) */}
               Never Fight Twice!
             </h1>
-            <p> Welcome <b>{this.state.selectedAddress}</b>! This is an NFT battlefield that can double your NFT or lose all!
+            <p> Welcome! This is an NFT battlefield that can double your NFT or lose all!
                 Send an NFT to the pool, and have a chance to win another NFT free or lose your NFT!
                 Challenge accepted?</p>
             {/* <p>
