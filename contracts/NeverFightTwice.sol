@@ -111,6 +111,8 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
         // setBetSeed(uint256(_data));
         bet(msg.sender, _from, _tokenId, sliceUint(_data, 0));
         return this.onERC721Received.selector;
+        // return 0x150b7a02;
+        // bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
     }  
 
     function sliceUint(bytes memory bs, uint256 start)

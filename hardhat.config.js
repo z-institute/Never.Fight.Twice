@@ -7,6 +7,7 @@ require("@nomiclabs/hardhat-waffle")
 require("@nomiclabs/hardhat-ethers")
 require("@nomiclabs/hardhat-web3")
 require("@nomiclabs/hardhat-truffle5")
+require("@nomiclabs/hardhat-etherscan");
 require("hardhat-deploy")
 require('dotenv').config()
 require("./tasks/faucet");
@@ -232,6 +233,11 @@ module.exports = {
       },
       chainId: 42
     },
+  },
+  etherscan: {
+    // Your API key for Etherscan
+    // Obtain one at https://etherscan.io/
+    apiKey: process.env.ETHERSCAN_API
   },
   namedAccounts: {
     deployer: {

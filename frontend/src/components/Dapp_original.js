@@ -5,8 +5,10 @@ import { ethers } from "ethers";
 
 // We import the contract's artifacts and address here, as we are going to be
 // using them with ethers
+import MockLinkArt from "../contracts/MockLink.json";
 import NeverFightTwiceArt from "../contracts/NeverFightTwice.json";
 import NFTSimpleArt from "../contracts/NFTSimple.json";
+import VRFCoordinatorMockArt from "../contracts/VRFCoordinatorMock.json";
 import contractAddress from "../contracts/contract-address.json";
 
 // All the logic of this dapp is contained in the Dapp component.
@@ -20,8 +22,6 @@ import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
 const HARDHAT_NETWORK_ID = '1337';
-const NeverFightTwiceAddr = '0x2DC272108F86832b59eb46ecfD5c117601d6b58e';
-const NFTSimpleAddr = '0xB40698744C409069e3dbC90172dB91EDa0D02ac1';
 
 // This is an error code that indicates that the user canceled a transaction
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
@@ -217,8 +217,11 @@ export class Dapp extends React.Component {
     this._provider = new ethers.providers.Web3Provider(window.ethereum);
     // this.web3 = new Web3(this._provider);
 
-    this.neverFightTwice = new ethers.Contract(NeverFightTwiceAddr,NeverFightTwiceArt.abi,this._provider.getSigner(0));
-    this.nftSimple = new ethers.Contract(NFTSimpleAddr,NFTSimpleArt.abi,this._provider.getSigner(0));
+    this.link = new ethers.Contract(contractAddress.MockLink,MockLinkArt.abi,this._provider.getSigner(0));
+    this.neverFightTwice = new ethers.Contract(contractAddress.NeverFightTwice,NeverFightTwiceArt.abi,this._provider.getSigner(0));
+    this.nftSimple = new ethers.Contract(contractAddress.NFTSimple,NFTSimpleArt.abi,this._provider.getSigner(0));
+    this.vrfCoordinatorMock = new ethers.Contract(contractAddress.VRFCoordinatorMock,VRFCoordinatorMockArt.abi,this._provider.getSigner(0));
+   
   }
 
   // The next to methods are needed to start and stop polling data. While
@@ -283,7 +286,6 @@ export class Dapp extends React.Component {
       })
 
       let tx = await this.nftSimple._safeTransferFrom(this.state.selectedAddress, this.neverFightTwice.address, parseInt(_tokenId), [...Buffer.from(_seed)])
-      console.log("transaction sent")
       this.setState({ txBeingSent: tx.hash });
       let receipt = await tx.wait()
       let requestId = receipt.events[5].data.substring(0,66)
@@ -293,7 +295,7 @@ export class Dapp extends React.Component {
       }
 
       // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, this.neverFightTwice.address)
-      // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, this.neverFightTwice.address)
+      await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, this.neverFightTwice.address)
       let randomNumber = await this.neverFightTwice.requestIdToRandomNumber(requestId)
       // let randomNumber = await this.neverFightTwice.getRandomNumberFromRequestId(requestId)
       console.log(randomNumber.toNumber())
