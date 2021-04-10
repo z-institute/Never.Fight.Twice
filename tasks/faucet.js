@@ -25,12 +25,16 @@ task("faucet", "Sends ETH and tokens to an address")
     const addressJson = fs.readFileSync(addressesFile);
     const address = JSON.parse(addressJson);
 
-    if ((await ethers.provider.getCode(address.Token)) === "0x") {
+    if ((await ethers.provider.getCode(address.MockLink)) === "0x") {
       console.error("You need to deploy your contract first");
       return;
     }
 
-    const token = await ethers.getContractAt("Token", address.Token);
+    let nftNumber = 123
+    const nftSimple = await ethers.getContractAt("NFTSimple", address.NFTSimple);
+    await nftSimple.mint(receiver, nftNumber);
+
+    const token = await ethers.getContractAt("MockLink", address.MockLink);
     const [sender] = await ethers.getSigners();
 
     const tx = await token.transfer(receiver, 100);
@@ -42,5 +46,5 @@ task("faucet", "Sends ETH and tokens to an address")
     });
     await tx2.wait();
 
-    console.log(`Transferred 1 ETH and 100 tokens to ${receiver}`);
+    console.log(`Transferred 1 ETH , 1 NTFS and 100 tokens to ${receiver}`);
   });
