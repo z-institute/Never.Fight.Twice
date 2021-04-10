@@ -264,7 +264,7 @@ export class Dapp extends React.Component {
   // don't need to poll it. If that's the case, you can just fetch it when you
   // initialize the app, as we do with the token data.
   _startPollingData() {
-    this._pollDataInterval = setInterval(() => this._updateBalance(), 1000);
+    this._pollDataInterval = setInterval(() => this._updateBalance(), 10000);
 
     // We run it once immediately so we don't have to wait for it
     this._updateBalance();
@@ -326,7 +326,7 @@ export class Dapp extends React.Component {
         tokenId: item.token_id
       })
     });
-    console.log(NFTs.length, commits.assets.length)
+    // console.log(NFTs.length, commits.assets.length)
     this.setState({ balance: balance,  balanceNeverFightTwice: balanceNeverFightTwice, tokenIds: tokenIds, tokenIdsNeverFightTwice: tokenIdsNeverFightTwice, NFTs: NFTs});
     console.log('updated balance')
   }
