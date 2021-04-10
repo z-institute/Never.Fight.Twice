@@ -20,9 +20,11 @@ import { Transfer } from "./Transfer";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
+import { AddNFT } from "./AddNFT";
 const HARDHAT_NETWORK_ID = '1337';
 const NeverFightTwiceAddr = '0x2DC272108F86832b59eb46ecfD5c117601d6b58e';
 const NFTSimpleAddr = '0xB40698744C409069e3dbC90172dB91EDa0D02ac1';
+const options = {method: 'GET'};
 
 // This is an error code that indicates that the user canceled a transaction
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
@@ -87,7 +89,7 @@ export class Dapp extends React.Component {
 
     // If the token data or the user's balance hasn't loaded yet, we show
     // a loading component.
-    if (!this.state.tokenData || !this.state.balance || !this.state.balanceNeverFightTwice || !this.state.tokenIds || !this.state.tokenIdsNeverFightTwice) {
+    if (!this.state.tokenData || !this.state.balance || !this.state.balanceNeverFightTwice || !this.state.tokenIds || !this.state.tokenIdsNeverFightTwice || !this.NFTs) {
       return <Loading />;
     }
 
@@ -145,12 +147,23 @@ export class Dapp extends React.Component {
 
         <div className="row">
           <div className="col-12">
+              <AddNFT
+                NFTs={this.NFTs}
+                transferTokens={(nftContractAddr, tokenId, seed) =>
+                  this._transferTokens(nftContractAddr, tokenId, seed)
+                }
+              />
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-12">
             {/*
               If the user has no tokens, we don't show the Tranfer form
             */}
-            {this.state.balance.eq(0) && (
+            {/* {this.state.balance.eq(0) && (
               <NoTokensMessage selectedAddress={this.state.selectedAddress} />
-            )}
+            )} */}
 
             {/*
               This component displays a form that the user can use to send a 
@@ -158,14 +171,14 @@ export class Dapp extends React.Component {
               The component doesn't have logic, it just calls the transferTokens
               callback.
             */}
-            {this.state.balance.gt(0) && (
+            {/* {this.state.balance.gt(0) && (
               <Transfer
                 transferTokens={(tokenId, seed) =>
                   this._transferTokens(tokenId, seed)
                 }
                 tokenSymbol={this.state.tokenData.symbol}
               />
-            )}
+            )} */}
           </div>
         </div>
       </div>
@@ -180,9 +193,9 @@ export class Dapp extends React.Component {
     const [selectedAddress] = await window.ethereum.enable();
 
     // First we check the network is 8545
-    if (!this._checkNetwork()) {
-      return;
-    }
+    // if (!this._checkNetwork()) {
+    //   return;
+    // }
 
     this._initialize(selectedAddress);
 
@@ -202,7 +215,7 @@ export class Dapp extends React.Component {
     });
   }
 
-  _initialize(userAddress) {
+  async _initialize(userAddress) {
    
     this.setState({
       selectedAddress: userAddress,
@@ -211,6 +224,31 @@ export class Dapp extends React.Component {
     this._intializeEthers();
     this._getTokenData();
     this._startPollingData();
+
+    // TODO: get all NFTs
+    this.NFTs = []
+    let response = await fetch(`https://api.opensea.io/api/v1/assets?owner=${userAddress}&order_direction=desc&offset=0&limit=20`, options);
+    let commits = await response.json();
+    // console.log(commits.assets)
+    let NFTs = []
+    commits.assets.forEach(function (item, index) {
+      NFTs.push({
+        name: item.name,
+        nftContractName: item.asset_contract.name,
+        nftContractAddr: item.asset_contract.address,
+        thumbnail: item.image_thumbnail_url,
+        openseaLink: item.permalink,
+        tokenId: item.token_id
+      })
+      // console.log(item.name, item.asset_contract.address, item.asset_contract.name, item.image_thumbnail_url, item.permalink)
+    });
+    this.NFTs = NFTs;
+    console.log(NFTs)
+
+    // fetch()
+    // .then(response => console.log(response))
+    // .catch(err => console.error(err));
+
   }
 
   async _intializeEthers() {
@@ -234,6 +272,10 @@ export class Dapp extends React.Component {
 
     // We run it once immediately so we don't have to wait for it
     this._updateBalance();
+  }
+
+  _addNFTAddr(nfts){
+    console.log(nfts)
   }
 
   _stopPollingData() {
@@ -314,7 +356,7 @@ export class Dapp extends React.Component {
   // This method sends an ethereum transaction to transfer tokens.
   // While this action is specific to this application, it illustrates how to
   // send a transaction.
-  async _transferTokens(_seed, _tokenId) {
+  async _transferTokens(_nftContractAddr, _tokenId, _seed) {
 
     try {
       // If a transaction fails, we save that error in the component's state.
@@ -324,11 +366,13 @@ export class Dapp extends React.Component {
 
       // We send the transaction, and save its hash in the Dapp's state. This
       // way we can indicate that we are waiting for it to be mined.      
-      this._provider._addEventListener("Lose", function(){
-        console.log("lose event found");
-      })
+      // this._provider._addEventListener("Lose", function(){
+      //   console.log("lose event found");
+      // })
 
-      let tx = await this.nftSimple._safeTransferFrom(this.state.selectedAddress, this.neverFightTwice.address, parseInt(_tokenId), [...Buffer.from(_seed)])
+      let nftContract = new ethers.Contract(_nftContractAddr, ERC721Art.abi, this._provider.getSigner(0));
+      let tx = await nftContract['safeTransferFrom(address,address,uint256,bytes)'](this.state.selectedAddress.toString(), this.neverFightTwice.address.toString(), _tokenId, [...Buffer.from(_seed)]);
+      // let tx = await nftContract.safeTransferFrom(this.state.selectedAddress, this.neverFightTwice.address, parseInt(_tokenId), [...Buffer.from(_seed)])
       console.log("transaction sent")
       this.setState({ txBeingSent: tx.hash });
       let receipt = await tx.wait()
