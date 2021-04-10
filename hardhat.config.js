@@ -223,7 +223,9 @@ module.exports = {
       accounts: {
         mnemonic: process.env.MNEMONIC,
         initialIndex: 1 // cause chainlink hackathon account is the second one
-      }
+      },
+      chainId: 4,
+      gas: 4612388 // Gas limit used for deploys
     },
     kovan: {
       url: process.env.KOVAN_RPC_URL,
