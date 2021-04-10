@@ -22,16 +22,15 @@ async function checkBetEvent(_tokenId){
     return requestId
 }
 
-async function checkWinLoseEvent(isWin, requestId){
+async function checkWinLoseEvent(isWin, requestId, randomNumber){
     let eventName = isWin? "Win": "Lose"
-    let RANDOM_NUMBER_VRF = isWin? RANDOM_NUMBER_VRF_WIN: RANDOM_NUMBER_VRF_LOSE
     let events = await neverFightTwiceWeb3.getPastEvents(eventName)
     // console.log(await neverFightTwiceWeb3.getPastEvents('allEvents'))
     // console.log(await neverFightTwiceWeb3.getPastEvents('Lose'))
     expect(events[0].event).to.equal(eventName);
     expect(events[0].returnValues.requestId).to.equal(requestId);
     expect(events[0].returnValues._better).to.equal(alice.address);
-    expect(events[0].returnValues.randomNumber).to.equal(RANDOM_NUMBER_VRF);
+    expect(events[0].returnValues.randomNumber).to.equal(randomNumber);
 }
 
 describe('#bet', () => {
@@ -82,56 +81,134 @@ describe('#bet', () => {
         expect(nftNum).to.equal(4)
     })
 
-    it('should send NFT to NeverFightTwice', async () => {
-        await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0, 123) // tokenId = 0
-        let requestId = await checkBetEvent(0)
+    it('check balance beofre bet', async () => {
+        let nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
+        console.log("Before Bet: balance Alice",nftNum)
+        expect(nftNum).to.equal(4)
+
+        nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
+        console.log("Before Bet: balance N.F.T", nftNum)
+        expect(nftNum).to.equal(0)
+    })
+
+    it('should send NFT to NeverFightTwic: should lose cause no NFT in the contract', async () => {
+
+        tx = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0, 123) // tokenId = 0
+        receipt = await tx.wait()
+        requestId = receipt.events[5].data.substring(0,66)
 
         //Test the result of the random number request
         await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, neverFightTwice.address)
         let randomNumber = await neverFightTwice.requestIdToRandomNumber(requestId)
         expect(randomNumber).to.equal(RANDOM_NUMBER_VRF_LOSE)
-        await checkWinLoseEvent(false, requestId) // win if the random number is an odd number, BUT!! lose if there is no NFTs in the contract
+        await checkWinLoseEvent(false, requestId, RANDOM_NUMBER_VRF_LOSE) // win if the random number is an odd number, BUT!! lose if there is no NFTs in the contract
+        arrLength = await neverFightTwice.NFTsLen()
+        expect(arrLength).to.equal(1)
 
-        // let tx0 = await nftSimple.transferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
-        let tx1 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 1, 123) // tokenId = 1
-        requestId = await checkBetEvent(1) // if the seed is the same then result is the same
-        await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, neverFightTwice.address)
-        randomNumber = await neverFightTwice.requestIdToRandomNumber(requestId)
-        expect(randomNumber).to.equal(RANDOM_NUMBER_VRF_WIN)
-        await checkWinLoseEvent(true, requestId) // win cause there is NFT in the contract
-
-        let tx2 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 2, 123) // tokenId = 2
-        let tx3 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 3, 123) // tokenId = 3
-
-        // let receipt0 = await tx0.wait()
-        let receipt1 = await tx1.wait()
-        let receipt2 = await tx2.wait()
-        let receipt3 = await tx3.wait()
-        
-        // console.log(receipt0.events)
-        //console.log(receipt1.events)
-        //console.log(receipt2.events)
-        //console.log(receipt3.events)
-
-        //await expectEvent(receipt, 'Bet', { _NFTContract: nftSimple.address, _better: alice.address, _tokenId: 0 })
-
-        let nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
+        nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         console.log("balance Alice",nftNum)
-        expect(nftNum).to.equal(1)
+        expect(nftNum).to.equal(3)
 
         nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
         console.log("balance N.F.T", nftNum)
+        expect(nftNum).to.equal(1)
+    })
+        it('should win', async () => {
+
+        // let tx0 = await nftSimple.transferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
+        let tx = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 1, 123) // tokenId = 1
+        receipt = await tx.wait()
+        requestId = receipt.events[5].data.substring(0,66)
+
+        await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, neverFightTwice.address)
+        randomNumber = await neverFightTwice.requestIdToRandomNumber(requestId)
+        expect(randomNumber).to.equal(RANDOM_NUMBER_VRF_WIN)
+        await checkWinLoseEvent(true, requestId, RANDOM_NUMBER_VRF_WIN) // win cause there is NFT in the contract
+        arrLength = await neverFightTwice.NFTsLen()
+        expect(arrLength).to.equal(0)
+
+        nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
+        console.log("balance Alice",nftNum)
+        expect(nftNum).to.equal(4)
+
+        nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
+        console.log("balance N.F.T", nftNum)
+        expect(nftNum).to.equal(0)
+    })
+
+    it('should lose cause no NFT in the contract', async () => {
+        let tx2 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 2, 123) // tokenId = 2
+        requestId = await checkBetEvent(2) // if the seed is the same then result is the same
+        // receipt = await tx2.wait()
+        // requestId = receipt.events[2].topics[0] // if the seed is the same then result is the same
+        await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, neverFightTwice.address)
+        randomNumber = await neverFightTwice.requestIdToRandomNumber(requestId)
+        expect(randomNumber).to.equal(RANDOM_NUMBER_VRF_WIN)
+        await checkWinLoseEvent(false, requestId, RANDOM_NUMBER_VRF_WIN) 
+        arrLength = await neverFightTwice.NFTsLen()
+        expect(arrLength).to.equal(1)
+
+        nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
+        console.log("balance Alice",nftNum)
         expect(nftNum).to.equal(3)
 
-        let owner_0 = await nftSimple.ownerOf(0)
-        let owner_1 = await nftSimple.ownerOf(1)
+        nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
+        console.log("balance N.F.T", nftNum)
+        expect(nftNum).to.equal(1)
 
-        console.log("owner of NFT O",owner_0)
-        expect(owner_0).to.equal(neverFightTwice.address)
-
-        console.log("owner of NFT 1",owner_1)
-        expect(owner_1).to.equal(alice.address)
     })
+
+    it('should lose', async () => {
+        let tx3 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 3, 123) // tokenId = 3
+        requestId = await checkBetEvent(3) // if the seed is the same then result is the same
+        // receipt = await tx3.wait()
+        // requestId = receipt.events[2].topics[0] 
+
+        await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, neverFightTwice.address)
+        randomNumber = await neverFightTwice.requestIdToRandomNumber(requestId)
+        expect(randomNumber).to.equal(RANDOM_NUMBER_VRF_LOSE)
+        await checkWinLoseEvent(false, requestId, RANDOM_NUMBER_VRF_LOSE) 
+        arrLength = await neverFightTwice.NFTsLen()
+        expect(arrLength).to.equal(2)
+
+        nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
+        console.log("balance Alice",nftNum)
+        expect(nftNum).to.equal(2)
+
+        nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
+        console.log("balance N.F.T", nftNum)
+        expect(nftNum).to.equal(2)
+
+        // let owner_0 = await nftSimple.ownerOf(0)
+        // let owner_1 = await nftSimple.ownerOf(1)
+
+        // console.log("owner of NFT O",owner_0)
+        // expect(owner_0).to.equal(alice.address)
+
+        // console.log("owner of NFT 1",owner_1)
+        // expect(owner_1).to.equal(alice.address)
+    })
+
+    // it('should win', async () => {
+
+    //     // let tx0 = await nftSimple.transferFrom(alice.address, neverFightTwice.address, 0) // tokenId = 0
+    //     let tx1 = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 1, 123) // tokenId = 1
+    //     requestId = await checkBetEvent(0) // if the seed is the same then result is the same
+    //     await vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, neverFightTwice.address)
+    //     randomNumber = await neverFightTwice.requestIdToRandomNumber(requestId)
+    //     expect(randomNumber).to.equal(RANDOM_NUMBER_VRF_WIN)
+    //     await checkWinLoseEvent(true, requestId, RANDOM_NUMBER_VRF_WIN) // win cause there is NFT in the contract
+    //     arrLength = await neverFightTwice.NFTsLen()
+    //     expect(arrLength).to.equal(0)
+
+    //     nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
+    //     console.log("balance Alice",nftNum)
+    //     expect(nftNum).to.equal(4)
+
+    //     nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
+    //     console.log("balance N.F.T", nftNum)
+    //     expect(nftNum).to.equal(0)
+    // })
 
 
 })

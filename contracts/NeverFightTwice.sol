@@ -13,6 +13,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
     address public VRFCoordinator;
     // rinkeby: 0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B
     address public LinkToken;
+    uint256 public NFTsLen;
     // rinkeby: 0x01BE23585060835E02B77ef475b0Cc51aA1e0709a
 
     struct NFT {
@@ -30,6 +31,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
     event Win(address _better, bytes32 requestId, uint256 randomNumber);
     event Lose(address _better, bytes32 requestId, uint256 randomNumber);
     event Bet(bytes32 requestId, address _NFTContract, address _better, uint256 _tokenId, uint256 _seed);
+    // event RequestedRandomness(bytes32 requestId);
 
     /**
      * Constructor inherits VRFConsumerBase
@@ -52,6 +54,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
         bytes32 requestId = requestRandomness(keyHash, fee, _seed); // requestRandomness is imported from VRFConsumerBase
         requestIdToNFT[requestId] = NFT(_better, _NFTContract, _tokenId);
 
+        // emit RequestedRandomness(requestId);
         emit Bet(requestId, _NFTContract, _better, _tokenId, _seed);
 
         return requestId;
@@ -67,7 +70,9 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
         NFT memory nft = requestIdToNFT[requestId];
         requestIdToRandomNumber[requestId] = randomNumber;
 
-        if(randomNumber.mod(2) == 0 || NFTs.length == 0) {
+        if(randomNumber.mod(2) == 0 || NFTsLen == 0) {
+            emit Lose(nft.owner, requestId, randomNumber);
+
             // bettwe lose all NFTs, save this NFT in our database 
             NFTs.push(
                 NFT(
@@ -76,7 +81,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
                     nft.tokenId
                 )
             );
-            emit Lose(nft.owner, requestId, randomNumber);
+            NFTsLen++;
         }
         else {
             // better win another k NFTs
@@ -84,14 +89,15 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
             // send the NFT to the better 
             ERC721(nft.NFTcontract).safeTransferFrom(address(this), nft.owner, nft.tokenId);
 
-            uint256 winningNFTId = randomNumber.mod(NFTs.length);
+            uint256 winningNFTId = randomNumber.mod(NFTsLen);
             NFT memory winningNFT = NFTs[winningNFTId];
             
             // remove element 
-            NFTs[winningNFTId] = NFTs[NFTs.length - 1]; // Move the last element into the place to delete
-            NFTs.pop(); // Remove the last element
+            NFTs[winningNFTId] = NFTs[NFTsLen - 1]; // Move the last element into the place to delete
+            delete NFTs[NFTsLen - 1]; // Remove the last element
+            NFTsLen--;
             
-            ERC721(winningNFT.NFTcontract).safeTransferFrom(address(this), winningNFT.owner, winningNFT.tokenId);
+            ERC721(winningNFT.NFTcontract).safeTransferFrom(address(this), nft.owner, winningNFT.tokenId);
 
             emit Win(nft.owner, requestId, randomNumber);
         }

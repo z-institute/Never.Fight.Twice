@@ -281,12 +281,6 @@ export class Dapp extends React.Component {
     this._pollDataInterval = undefined;
   }
 
-  async _checkBetEvent(_tokenId){
-    let events = await this.neverFightTwice.getPastEvents('Bet')
-    let requestId = events[0].returnValues.requestId
-    return requestId
-}
-
   // See your NFTSimple info
   // The next two methods just read from the contract and store the results
   // in the component state.
@@ -332,14 +326,15 @@ export class Dapp extends React.Component {
       let tx = await this.nftSimple._safeTransferFrom(this.state.selectedAddress, this.neverFightTwice.address, parseInt(_tokenId), [...Buffer.from(_seed)])
       this.setState({ txBeingSent: tx.hash });
       let receipt = await tx.wait()
-      let requestId = receipt.events[2].topics[0]
+      let requestId = receipt.events[5].data.substring(0,66)
       
       if (receipt.status === 0) {
         throw new Error("Transaction failed");
       }
 
       await this._updateBalance();
-      await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, this.neverFightTwice.address)
+      // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, this.neverFightTwice.address)
+      await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, this.neverFightTwice.address)
       let randomNumber = await this.neverFightTwice.requestIdToRandomNumber(requestId)
       console.log(randomNumber.toNumber())
 
