@@ -50,14 +50,12 @@ npx hardhat test ./test/NeverFightTwice.test.js
 7. Run Hardhat's testing network (if you reset the local network, remember to reset account in MetaMask > Settings > Advanced > Reset Account! Otherwise you will have nonce problem)
 ```
 npx hardhat node
-
 ```
 8. Deploy contracts (remember to `npx hardhat compile` if u change the contracts)
 ```
 npx hardhat run scripts/deploy.js --network localhost
 // npx hardhat run scripts/deploy_rinkeby.js --network rinkeby
 // npx hardhat run scripts/deploy_kovan.js --network kovan
-
 ```
 9. Import the private key of the first account into MetaMask and later connect wallet using this address.
 10. Run the frontend
@@ -75,7 +73,6 @@ npx hardhat verify --network rinkeby 0x0cE4C9201471222B26bf6039A0ecfdba02D1C9D4 
 npx hardhat verify --network rinkeby 0x193c9bE4D9bb1d5dd7C79606015C2746a4cDa235 
 
 // npx hardhat verify --network rinkeby DEPLOYED_CONTRACT_ADDRESS "Constructor argument 1" "Constructor argument 2"
-
 ```
 12. Send LINK to NeverFightTwice contract!
 
