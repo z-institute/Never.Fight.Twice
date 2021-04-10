@@ -61,6 +61,11 @@ async function main() {
   await nftSimple.mint(alice.address, 1); // tokenId = 1
   await nftSimple.mint(alice.address, 2); // tokenId = 2
   await nftSimple.mint(alice.address, 3); // tokenId = 3
+  await nftSimple.mint(alice.address, 4); // tokenId = 3
+  await nftSimple.mint(alice.address, 5); // tokenId = 3
+  await nftSimple.mint(alice.address, 6); // tokenId = 3
+  await nftSimple.mint(alice.address, 7); // tokenId = 3
+  await nftSimple.mint(alice.address, 8); // tokenId = 3
 
   let owner_0 = await nftSimple.ownerOf(0)
   let owner_1 = await nftSimple.ownerOf(1)

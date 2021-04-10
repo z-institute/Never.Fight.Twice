@@ -21,11 +21,13 @@ import { Transfer } from "./Transfer";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
-import Axios from "axios"; // Import Axios or use Fetch.
+
+// import Axios from "axios"; // Import Axios or use Fetch.
+// import '@metamask/legacy-web3'
 // This is the Hardhat Network id, you might change it in the hardhat.config.js
 // Here's a list of network ids https://docs.metamask.io/guide/ethereum-provider.html#properties
 // to use when deploying to other networks.
-const HARDHAT_NETWORK_ID = '31337';
+const HARDHAT_NETWORK_ID = '1337';
 
 // This is an error code that indicates that the user canceled a transaction
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
@@ -250,13 +252,14 @@ export class Dapp extends React.Component {
     this.nftSimple = new ethers.Contract(contractAddress.NFTSimple,NFTSimpleArt.abi,this._provider.getSigner(0));
     this.vrfCoordinatorMock = new ethers.Contract(contractAddress.VRFCoordinatorMock,VRFCoordinatorMockArt.abi,this._provider.getSigner(0));
     // const contract = JSON.parse(fs.readFileSync('artifacts/contracts/NeverFightTwice.sol/NeverFightTwice.json', 'utf8'));
-    Axios(NeverFightTwiceArt).then(res => {
-      const contract = JSON.parse(res.data)
-      this.neverFightTwiceWeb3 = new window.web3.eth.Contract(contract.abi, this.neverFightTwice.address)
-      console.log(this.neverFightTwiceWeb3.address)
-    });
+    // Axios(NeverFightTwiceArt).then(res => {
+    //   const contract = JSON.parse(res.data)
+    //   this.neverFightTwiceWeb3 = new window.web3.eth.Contract(contract.abi, this.neverFightTwice.address)
+    //   console.log(this.neverFightTwiceWeb3.address)
+    // });
     // const contract = JSON.parse(neverFightTwiceContractFile);
-    // this.neverFightTwiceWeb3 = new this._provider.eth.Contract(contract.abi, this.neverFightTwice.address)
+    // const { web3 } = window
+    // this.neverFightTwiceWeb3 = new web3.eth.Contract(NeverFightTwiceArt.abi, this.neverFightTwice.address)
   }
 
   // The next to methods are needed to start and stop polling data. While
@@ -279,7 +282,7 @@ export class Dapp extends React.Component {
   }
 
   async _checkBetEvent(_tokenId){
-    let events = await this.neverFightTwiceWeb3.getPastEvents('Bet')
+    let events = await this.neverFightTwice.getPastEvents('Bet')
     let requestId = events[0].returnValues.requestId
     return requestId
 }
@@ -293,6 +296,14 @@ export class Dapp extends React.Component {
 
     this.setState({ tokenData: { name, symbol } });
   }
+
+  hashCode (s) {
+    var h = 0, l = s.length, i = 0;
+    if ( l > 0 )
+      while (i < l)
+        h = (h << 5) - h + s.charCodeAt(i++) | 0;
+    return h;
+  };
 
   // TODO: change to update all of your NFT balance
   async _updateBalance() {
@@ -314,26 +325,23 @@ export class Dapp extends React.Component {
 
       // We send the transaction, and save its hash in the Dapp's state. This
       // way we can indicate that we are waiting for it to be mined.      
+      this._provider._addEventListener("Lose", function(){
+        console.log("lose event found");
+      })
+
       let tx = await this.nftSimple._safeTransferFrom(this.state.selectedAddress, this.neverFightTwice.address, parseInt(_tokenId), [...Buffer.from(_seed)])
       this.setState({ txBeingSent: tx.hash });
-
-      // We use .wait() to wait for the transaction to be mined. This method
-      // returns the transaction's receipt.
-      const receipt = await tx.wait();
-
-      // The receipt, contains a status flag, which is 0 to indicate an error.
+      let receipt = await tx.wait()
+      let requestId = receipt.events[2].topics[0]
+      
       if (receipt.status === 0) {
-        // We can't know the exact error that make the transaction fail once it
-        // was mined, so we throw this generic one.
         throw new Error("Transaction failed");
       }
 
-      // If we got here, the transaction was successful, so you may want to
-      // update your state. Here, we update the user's balance.
       await this._updateBalance();
-
-      let requestId = await this._checkBetEvent(_tokenId)
       await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, this.neverFightTwice.address)
+      let randomNumber = await this.neverFightTwice.requestIdToRandomNumber(requestId)
+      console.log(randomNumber.toNumber())
 
     } catch (error) {
       // We check the error code to see if this error was produced because the
@@ -383,6 +391,7 @@ export class Dapp extends React.Component {
     if (window.ethereum.networkVersion === HARDHAT_NETWORK_ID) {
       return true;
     }
+    console.log(window.ethereum.networkVersion, HARDHAT_NETWORK_ID)
 
     this.setState({ 
       networkError: 'Please connect Metamask to Localhost:8545'
