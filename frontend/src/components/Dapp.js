@@ -21,12 +21,6 @@ import { Transfer } from "./Transfer";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
-
-// import Axios from "axios"; // Import Axios or use Fetch.
-// import '@metamask/legacy-web3'
-// This is the Hardhat Network id, you might change it in the hardhat.config.js
-// Here's a list of network ids https://docs.metamask.io/guide/ethereum-provider.html#properties
-// to use when deploying to other networks.
 const HARDHAT_NETWORK_ID = '1337';
 
 // This is an error code that indicates that the user canceled a transaction
@@ -178,35 +172,22 @@ export class Dapp extends React.Component {
   }
 
   componentWillUnmount() {
-    // We poll the user's balance, so we have to stop doing that when Dapp
-    // gets unmounted
     this._stopPollingData();
   }
 
   async _connectWallet() {
-    // This method is run when the user clicks the Connect. It connects the
-    // dapp to the user's wallet, and initializes it.
-
-    // To connect to the user's wallet, we have to run this method.
-    // It returns a promise that will resolve to the user's address.
     const [selectedAddress] = await window.ethereum.enable();
 
-    // Once we have the address, we can initialize the application.
-
-    // First we check the network
+    // First we check the network is 8545
     if (!this._checkNetwork()) {
       return;
     }
 
     this._initialize(selectedAddress);
 
-    // We reinitialize it whenever the user changes their account.
     window.ethereum.on("accountsChanged", ([newAddress]) => {
       this._stopPollingData();
-      // `accountsChanged` event can be triggered with an undefined newAddress.
-      // This happens when the user removes the Dapp from the "Connected
-      // list of sites allowed access to your addresses" (Metamask > Settings > Connections)
-      // To avoid errors, we reset the dapp state 
+
       if (newAddress === undefined) {
         return this._resetState();
       }
@@ -214,7 +195,6 @@ export class Dapp extends React.Component {
       this._initialize(newAddress);
     });
     
-    // We reset the dapp state if the network is changed
     window.ethereum.on("networkChanged", ([networkId]) => {
       this._stopPollingData();
       this._resetState();
@@ -222,18 +202,11 @@ export class Dapp extends React.Component {
   }
 
   _initialize(userAddress) {
-    // This method initializes the dapp
-
-    // We first store the user's address in the component's state
+   
     this.setState({
       selectedAddress: userAddress,
     });
 
-    // Then, we initialize ethers, fetch the token's data, and start polling
-    // for the user's balance.
-
-    // Fetching the token data and the user's balance are specific to this
-    // sample project, but you can reuse the same initialization pattern.
     this._intializeEthers();
     this._getTokenData();
     this._startPollingData();
@@ -244,22 +217,11 @@ export class Dapp extends React.Component {
     this._provider = new ethers.providers.Web3Provider(window.ethereum);
     // this.web3 = new Web3(this._provider);
 
-    // When, we initialize the contract using that provider and the token's
-    // artifact. You can do this same thing with your contracts.
-    // console.log(this._provider.getSigner(0).getAddress())
     this.link = new ethers.Contract(contractAddress.MockLink,MockLinkArt.abi,this._provider.getSigner(0));
     this.neverFightTwice = new ethers.Contract(contractAddress.NeverFightTwice,NeverFightTwiceArt.abi,this._provider.getSigner(0));
     this.nftSimple = new ethers.Contract(contractAddress.NFTSimple,NFTSimpleArt.abi,this._provider.getSigner(0));
     this.vrfCoordinatorMock = new ethers.Contract(contractAddress.VRFCoordinatorMock,VRFCoordinatorMockArt.abi,this._provider.getSigner(0));
-    // const contract = JSON.parse(fs.readFileSync('artifacts/contracts/NeverFightTwice.sol/NeverFightTwice.json', 'utf8'));
-    // Axios(NeverFightTwiceArt).then(res => {
-    //   const contract = JSON.parse(res.data)
-    //   this.neverFightTwiceWeb3 = new window.web3.eth.Contract(contract.abi, this.neverFightTwice.address)
-    //   console.log(this.neverFightTwiceWeb3.address)
-    // });
-    // const contract = JSON.parse(neverFightTwiceContractFile);
-    // const { web3 } = window
-    // this.neverFightTwiceWeb3 = new web3.eth.Contract(NeverFightTwiceArt.abi, this.neverFightTwice.address)
+   
   }
 
   // The next to methods are needed to start and stop polling data. While
@@ -335,6 +297,7 @@ export class Dapp extends React.Component {
       // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, this.neverFightTwice.address)
       await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, this.neverFightTwice.address)
       let randomNumber = await this.neverFightTwice.requestIdToRandomNumber(requestId)
+      // let randomNumber = await this.neverFightTwice.getRandomNumberFromRequestId(requestId)
       console.log(randomNumber.toNumber())
 
       await this._updateBalance();
@@ -384,7 +347,7 @@ export class Dapp extends React.Component {
 
   // This method checks if Metamask selected network is Localhost:8545 
   _checkNetwork() {
-    if (window.ethereum.networkVersion === HARDHAT_NETWORK_ID) {
+    if (window.ethereum.networkVersion === HARDHAT_NETWORK_ID || window.ethereum.networkVersion === '42') { // kovan
       return true;
     }
     console.log(window.ethereum.networkVersion, HARDHAT_NETWORK_ID)

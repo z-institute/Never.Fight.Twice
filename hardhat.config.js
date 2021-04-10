@@ -229,7 +229,8 @@ module.exports = {
       accounts: {
         mnemonic: process.env.MNEMONIC,
         initialIndex: 1 // cause chainlink hackathon account is the second one
-      }
+      },
+      chainId: 42
     },
   },
   namedAccounts: {

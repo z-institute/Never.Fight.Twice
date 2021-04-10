@@ -107,7 +107,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
     // @param _from The address which previously owned the token
     // _operator = _from = _better in this case
     // msg.sender is the nft contract address
-    function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes memory _data) public override returns (bytes4) {
+    function onERC721Received(address, address _from, uint256 _tokenId, bytes memory _data) public override returns (bytes4) {
         // setBetSeed(uint256(_data));
         bet(msg.sender, _from, _tokenId, sliceUint(_data, 0));
         return this.onERC721Received.selector;

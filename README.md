@@ -39,9 +39,13 @@ npx hardhat deploy
 ```
 npx hardhat test ./test/NeverFightTwice.test.js
 ```
-5. Run Hardhat's testing network and deploy contracts (if you reset the local network, remember to reset account in MetaMask > Settings > Advanced > Reset Account! Otherwise you will have nonce problem)
+5. Run Hardhat's testing network (if you reset the local network, remember to reset account in MetaMask > Settings > Advanced > Reset Account! Otherwise you will have nonce problem)
 ```
 npx hardhat node
+
+```
+5. Deploy contracts (remember to `npx hardhat compile` if u change the contracts)
+```
 npx hardhat run scripts/deploy.js --network localhost
 
 ```
