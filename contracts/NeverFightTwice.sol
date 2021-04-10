@@ -87,7 +87,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
             // better win another k NFTs
             // use the random number to find an NFT
             // send the NFT to the better 
-            ERC721(nft.NFTcontract).safeTransferFrom(address(this), nft.owner, nft.tokenId);
+            ERC721(nft.NFTcontract).transferFrom(address(this), nft.owner, nft.tokenId);
 
             uint256 winningNFTId = randomNumber.mod(NFTsLen);
             NFT memory winningNFT = NFTs[winningNFTId];
@@ -97,7 +97,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
             delete NFTs[NFTsLen - 1]; // Remove the last element
             NFTsLen--;
             
-            ERC721(winningNFT.NFTcontract).safeTransferFrom(address(this), nft.owner, winningNFT.tokenId);
+            ERC721(winningNFT.NFTcontract).transferFrom(address(this), nft.owner, winningNFT.tokenId);
 
             emit Win(nft.owner, requestId, randomNumber);
         }
@@ -111,8 +111,6 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
         // setBetSeed(uint256(_data));
         bet(msg.sender, _from, _tokenId, sliceUint(_data, 0));
         return this.onERC721Received.selector;
-        // return 0x150b7a02;
-        // bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
     }  
 
     function sliceUint(bytes memory bs, uint256 start)
