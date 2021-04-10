@@ -31,12 +31,15 @@ npm install
 ## Running the code
 1. Duplicate the `.env.example` file and rename it to `.env`
 2. Fill in the values in `.env`. You may need to go to https://infura.io/ to register an account and get your rpc url.
-4. Run the frontend
+3. Run the frontend
 ```
 cd frontend
 npm install
 npm start
 ```
+4. Go to http://localhost:3000/ and switch to Rinkeby testnet on MetaMask
+5. Click on the "Bet" button under your NFTs to bet.
+6. Mint new NFTs in the bottom of the webpage to have more NFTs to bet!
 
 ## If you wanna run the code on local network or deploy yourself
 1. Compile the contracts
@@ -75,6 +78,7 @@ cd frontend
 npm install
 npm start
 ```
+9. Go to http://localhost:3000/ and connect your MetaMask wallet.
 
 ## Notes 
 This project is modified from https://github.com/pappas999/chainlink-hardhat-box
