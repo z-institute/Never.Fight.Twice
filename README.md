@@ -3,7 +3,7 @@
 
 An NFT battlefield that can double your NFT or lose all!
 Send an NFT to the pool, and have a chance to win another NFT free or lose your NFT!
-Bet 3 win another 3 NFTs or lose all. Challenge accepted?
+Challenge accepted?
 
 ## How to play?
 Send your NFT to the contract with your custom seed!
@@ -20,8 +20,8 @@ If the VRF coordinator returns an odd number, and there is at least one NFT in t
 - NeverFightTwice: [0x2DC272108F86832b59eb46ecfD5c117601d6b58e](https://kovan.etherscan.io/address/0x2DC272108F86832b59eb46ecfD5c117601d6b58e#code)
 - NFTSimple: [0xB40698744C409069e3dbC90172dB91EDa0D02ac1](https://kovan.etherscan.io/address/0xB40698744C409069e3dbC90172dB91EDa0D02ac1#code)
 
-## Dev
-The contracts are in `/contracts` folder, named `NeverFightTwice.sol` and `NFTSimple.sol`. The scripts are under progress. Check `scripts/sample-script.js` to understand the working flow.
+## Overview
+The contracts are in `contracts/` folder, named `NeverFightTwice.sol` and `NFTSimple.sol`. The deploy scripts are in `scripts/`. Check `test/NeverFightTwice.test.js` to understand the working flow. The core frontend code is in `frontend/src/components/Dapp.js`.
 
 ## Installation
 ```

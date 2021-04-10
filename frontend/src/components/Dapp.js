@@ -103,13 +103,18 @@ export class Dapp extends React.Component {
               {/* {this.state.tokenData.name} ({this.state.tokenData.symbol}) */}
               Never Fight Twice!
             </h1>
-            <p>
-              Welcome <b>{this.state.selectedAddress}</b>, you have{" "}
+            <p> Welcome <b>{this.state.selectedAddress}</b>! This is an NFT battlefield that can double your NFT or lose all!
+                Send an NFT to the pool, and have a chance to win another NFT free or lose your NFT!
+                Challenge accepted?</p>
+            {/* <p>
+              Welcome <b>{this.state.selectedAddress}</b>! */}
+              
+              {/* , you have{" "}
               <b>
                 {this.state.balance.toString()} {this.state.tokenData.symbol}
               </b>
-              . The tokenIds are <b>{Array.from(this.state.tokenIds).join(', ')}</b>
-            </p>
+              . The tokenIds are <b>{Array.from(this.state.tokenIds).join(', ')}</b> */}
+            {/* </p> */}
 
             <p>
               The NeverFightTwice contract <b>{this.neverFightTwice.address}</b> has{" "}
