@@ -332,11 +332,12 @@ export class Dapp extends React.Component {
         throw new Error("Transaction failed");
       }
 
-      await this._updateBalance();
       // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, this.neverFightTwice.address)
       await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, this.neverFightTwice.address)
       let randomNumber = await this.neverFightTwice.requestIdToRandomNumber(requestId)
       console.log(randomNumber.toNumber())
+
+      await this._updateBalance();
 
     } catch (error) {
       // We check the error code to see if this error was produced because the
