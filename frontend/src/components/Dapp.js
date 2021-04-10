@@ -7,6 +7,7 @@ import { ethers } from "ethers";
 // using them with ethers
 import NeverFightTwiceArt from "../contracts/NeverFightTwice.json";
 import NFTSimpleArt from "../contracts/NFTSimple.json";
+import ERC721Art from "../contracts/ERC721.json";
 import contractAddress from "../contracts/contract-address.json";
 
 // All the logic of this dapp is contained in the Dapp component.
@@ -86,7 +87,7 @@ export class Dapp extends React.Component {
 
     // If the token data or the user's balance hasn't loaded yet, we show
     // a loading component.
-    if (!this.state.tokenData || !this.state.balance || !this.state.balanceNeverFightTwice) {
+    if (!this.state.tokenData || !this.state.balance || !this.state.balanceNeverFightTwice || !this.state.tokenIds || !this.state.tokenIdsNeverFightTwice) {
       return <Loading />;
     }
 
@@ -103,7 +104,7 @@ export class Dapp extends React.Component {
               <b>
                 {this.state.balance.toString()} {this.state.tokenData.symbol}
               </b>
-              .
+              . The tokenIds are <b>{Array.from(this.state.tokenIds).join(', ')}</b>
             </p>
 
             <p>
@@ -111,7 +112,7 @@ export class Dapp extends React.Component {
               <b>
                 {this.state.balanceNeverFightTwice.toString()} {this.state.tokenData.symbol}
               </b>
-              .
+              . The tokenIds are <b>{Array.from(this.state.tokenIdsNeverFightTwice).join(', ')}</b>
             </p>
           </div>
         </div>
@@ -262,7 +263,52 @@ export class Dapp extends React.Component {
   async _updateBalance() {
     const balance = await this.nftSimple.balanceOf(this.state.selectedAddress);
     const balanceNeverFightTwice = await this.nftSimple.balanceOf(this.neverFightTwice.address);
-    this.setState({ balance: balance,  balanceNeverFightTwice: balanceNeverFightTwice});
+    let tokenIds = await this.listTokensOfOwner({
+      token: this.nftSimple.address, 
+      account: this.state.selectedAddress
+    })
+    let tokenIdsNeverFightTwice = await this.listTokensOfOwner({
+      token: this.nftSimple.address, 
+      account: this.neverFightTwice.address
+    })
+    this.setState({ balance: balance,  balanceNeverFightTwice: balanceNeverFightTwice, tokenIds: tokenIds, tokenIdsNeverFightTwice: tokenIdsNeverFightTwice});
+  }
+
+  async listTokensOfOwner({ token: tokenAddress, account }) {
+    const token = new ethers.Contract(tokenAddress, ERC721Art.abi, this._provider.getSigner(0));
+  
+    const sentLogs = await token.queryFilter(
+      token.filters.Transfer(account, null),
+    );
+    const receivedLogs = await token.queryFilter(
+      token.filters.Transfer(null, account),
+    );
+  
+    const logs = sentLogs.concat(receivedLogs)
+      .sort(
+        (a, b) =>
+          a.blockNumber - b.blockNumber ||
+          a.transactionIndex - b.TransactionIndex,
+      );
+  
+    const owned = new Set();
+  
+    for (const log of logs) {
+      const { from, to, tokenId } = log.args;
+      
+      if (this.addressEqual(to, account)) {
+        owned.add(tokenId.toString());
+      } else if (this.addressEqual(from, account)) {
+        owned.delete(tokenId.toString());
+      }
+    }
+  
+    // console.log([...owned].join('\n'));
+    return owned
+  }
+
+  addressEqual(a, b) {
+    return a.toLowerCase() === b.toLowerCase();
   }
 
   // This method sends an ethereum transaction to transfer tokens.
@@ -286,7 +332,7 @@ export class Dapp extends React.Component {
       console.log("transaction sent")
       this.setState({ txBeingSent: tx.hash });
       let receipt = await tx.wait()
-      let requestId = receipt.events[5].data.substring(0,66)
+      // let requestId = receipt.events[5].data.substring(0,66)
       
       if (receipt.status === 0) {
         throw new Error("Transaction failed");
@@ -294,9 +340,9 @@ export class Dapp extends React.Component {
 
       // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, this.neverFightTwice.address)
       // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, this.neverFightTwice.address)
-      let randomNumber = await this.neverFightTwice.requestIdToRandomNumber(requestId)
+      // let randomNumber = await this.neverFightTwice.requestIdToRandomNumber(requestId)
       // let randomNumber = await this.neverFightTwice.getRandomNumberFromRequestId(requestId)
-      console.log(randomNumber.toNumber())
+      // console.log(randomNumber.toNumber())
 
       await this._updateBalance();
 

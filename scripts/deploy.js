@@ -96,11 +96,13 @@ function saveFrontendFiles() {
   const NeverFightTwiceArt = artifacts.readArtifactSync("NeverFightTwice");
   const NFTSimpleArt = artifacts.readArtifactSync("NFTSimple");
   const VRFCoordinatorMockArt = artifacts.readArtifactSync("VRFCoordinatorMock");
+  const ERC721Art = artifacts.readArtifactSync("ERC721");
 
   fs.writeFileSync(contractsDir + "/MockLink.json",JSON.stringify(MockLinkArt, null, 2));
   fs.writeFileSync(contractsDir + "/NeverFightTwice.json",JSON.stringify(NeverFightTwiceArt, null, 2));
   fs.writeFileSync(contractsDir + "/NFTSimple.json",JSON.stringify(NFTSimpleArt, null, 2));
   fs.writeFileSync(contractsDir + "/VRFCoordinatorMock.json",JSON.stringify(VRFCoordinatorMockArt, null, 2));
+  fs.writeFileSync(contractsDir + "/ERC721.json",JSON.stringify(ERC721Art, null, 2));
 }
 
 main()
