@@ -18,6 +18,8 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
 import Grid from '@material-ui/core/Grid';
+// import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles'
+
 
 const responsive = {
   superLargeDesktop: {
@@ -116,7 +118,12 @@ export function AddNFT({ NFTs, transferTokens }) {
       </CardActionArea>
     </Card>
     <Box p={2}>
-    <Button variant="contained" color="primary" onClick={handleClickOpen} >
+    <Button variant="contained" color="secondary" onClick={handleClickOpen} style={{
+        transform: 'translate(50%, 0%)',
+        backgroundColor: '#FFD700',
+        color: 'black',
+        fontWeight: 'bold'
+    }}>
       Bet!
       </Button>
       <form onSubmit={handleSubmit}>

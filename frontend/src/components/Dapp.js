@@ -159,8 +159,11 @@ export class Dapp extends React.Component {
                   this._transferTokens(nftContractAddr, tokenId, seed)
                 }
               />
-             
+          </div>
+        </div>
 
+        <div className="row">
+          <div className="col-12">
             {/*
               This component displays a form that the user can use to send a 
               mint
@@ -173,32 +176,6 @@ export class Dapp extends React.Component {
                 tokenSymbol={this.state.tokenData.symbol}
               />
             )}
-          </div>
-        </div>
-
-        <div className="row">
-          <div className="col-12">
-            {/*
-              If the user has no tokens, we don't show the Tranfer form
-            */}
-            {/* {this.state.balance.eq(0) && (
-              <NoTokensMessage selectedAddress={this.state.selectedAddress} />
-            )} */}
-
-            {/*
-              This component displays a form that the user can use to send a 
-              transaction and transfer some tokens.
-              The component doesn't have logic, it just calls the transferTokens
-              callback.
-            */}
-            {/* {this.state.balance.gt(0) && (
-              <Transfer
-                transferTokens={(tokenId, seed) =>
-                  this._transferTokens(tokenId, seed)
-                }
-                tokenSymbol={this.state.tokenData.symbol}
-              />
-            )} */}
           </div>
         </div>
       </div>
