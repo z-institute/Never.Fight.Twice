@@ -1,5 +1,3 @@
-// contracts/MyNFT.sol
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.6.0;
 
 import "@chainlink/contracts/src/v0.6/VRFConsumerBase.sol";
@@ -11,10 +9,8 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
     bytes32 internal keyHash;
     uint256 internal fee;
     address public VRFCoordinator;
-    // rinkeby: 0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B
     address public LinkToken;
     uint256 public NFTsLen;
-    // rinkeby: 0x01BE23585060835E02B77ef475b0Cc51aA1e0709a
 
     struct NFT {
         address owner;
@@ -26,12 +22,10 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
 
     mapping (bytes32 => NFT) requestIdToNFT;
     mapping (bytes32 => uint256) public requestIdToRandomNumber;
-    // mapping (address => uint256) betterToSeed;
 
-    event Win(address _better, bytes32 requestId, uint256 randomNumber);
-    event Lose(address _better, bytes32 requestId, uint256 randomNumber);
+    event Win(address _better, bytes32 requestId, uint256 randomNumber, address NFTcontract_original, uint256 tokenId_original, address NFTcontract_win, uint256 tokenId_win);
+    event Lose(address _better, bytes32 requestId, uint256 randomNumber, address NFTcontract_original, uint256 tokenId_original);
     event Bet(bytes32 requestId, address _NFTContract, address _better, uint256 _tokenId, uint256 _seed);
-    // event RequestedRandomness(bytes32 requestId);
 
     /**
      * Constructor inherits VRFConsumerBase
@@ -71,7 +65,7 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
         requestIdToRandomNumber[requestId] = randomNumber;
 
         if(randomNumber.mod(2) == 0 || NFTsLen == 0) {
-            emit Lose(nft.owner, requestId, randomNumber);
+            emit Lose(nft.owner, requestId, randomNumber, nft.NFTcontract, nft.tokenId);
 
             // bettwe lose all NFTs, save this NFT in our database 
             NFTs.push(
@@ -99,7 +93,8 @@ contract NeverFightTwice is VRFConsumerBase, IERC721Receiver {
             
             ERC721(winningNFT.NFTcontract).transferFrom(address(this), nft.owner, winningNFT.tokenId);
 
-            emit Win(nft.owner, requestId, randomNumber);
+            emit Win(nft.owner, requestId, randomNumber, nft.NFTcontract, nft.tokenId, winningNFT.NFTcontract, winningNFT.tokenId);
+
         }
     }
 

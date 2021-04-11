@@ -68,7 +68,7 @@ export function AddNFT({ NFTs, transferTokens }) {
         />): 
         (<CardMedia
           className={classes.media}
-          image={"http://placekitten.com/200/200?image=" + (i+1).toString()}
+          image={"http://placekitten.com/200/200?image=" + (i%16+1).toString()}
           title="NFT image"
         />)}
         <CardContent>

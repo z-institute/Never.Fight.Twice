@@ -113,13 +113,14 @@ export class Dapp extends React.Component {
               . The tokenIds are <b>{Array.from(this.state.tokenIds).join(', ')}</b> */}
             {/* </p> */}
 
-            <p>
-              The NeverFightTwice contract <b>{this.neverFightTwice.address}</b> has{" "}
+            <span>
+              The <a href={"https://rinkeby.etherscan.io/address/"+this.neverFightTwice.address}>NeverFightTwice contract</a> has{" "}
               <b>
                 {this.state.balanceNeverFightTwice.toString()} {this.state.tokenData.symbol}
-              </b>
-              . The tokenIds are <b>{Array.from(this.state.tokenIdsNeverFightTwice).join(', ')}</b>
-            </p>
+              </b>. {this.state.balanceNeverFightTwice.gt(0) && (
+                <div>The tokenIds are <b>{Array.from(this.state.tokenIdsNeverFightTwice).join(', ')}</b></div>
+                )}
+            </span>
           </div>
         </div>
 
@@ -277,12 +278,30 @@ export class Dapp extends React.Component {
     }
 
     async checkWinLose(){
-        let response = "You "
         let logs = await this._provider.getLogs({address: this.neverFightTwice.address})
         let winLog = this.parseLogs(this.neverFightTwice, "Win", logs)
         let loseLog = this.parseLogs(this.neverFightTwice, "Lose", logs)
-        let betLog = this.parseLogs(this.neverFightTwice, "Bet", logs)
-        console.log(winLog, loseLog, betLog)
+        // console.log(winLog, loseLog)
+        
+        let response = "You "
+        let randomNumber, NFTcontract_win, NFTid_win, NFTcontract_original, NFTid_original
+        if(winLog.length != 0){
+          // win
+          response += "Win!\n"
+          randomNumber = winLog[0].args[2]
+          NFTcontract_original = winLog[0].args[3]
+          NFTid_original = winLog[0].args[3]
+          NFTcontract_win = winLog[0].args[4]
+          NFTid_win = winLog[0].args[5]
+          console.log('Win', randomNumber, NFTcontract_original, NFTid_original, NFTcontract_win, NFTid_win.toNumber())
+        }
+        else if(loseLog.length != 0){
+          // lose
+          response += "Lose.\n"
+          randomNumber = loseLog[0].args[2]
+          console.log('Lose', randomNumber, NFTcontract_original, NFTid_original)
+        }
+
         // let isWin = await this.neverFightTwice.requestIdToWinOrLose(requestId)
         // response += isWin? 'Win!\n': 'Lose!\n'
         // let randomNumber = await this.neverFightTwice.getRandomNumberFromRequestId(requestId)
@@ -307,7 +326,7 @@ export class Dapp extends React.Component {
     this._pollDataInterval = setInterval(() => {
       this._updateBalance()
       this.checkWinLose()
-    }, 10000);
+    }, 1000);
 
     // We run it once immediately so we don't have to wait for it
     this._updateBalance();

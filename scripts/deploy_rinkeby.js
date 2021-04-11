@@ -37,9 +37,9 @@ async function main() {
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
   const NeverFightTwice = await ethers.getContractFactory("NeverFightTwice")
-  const NFTSimple = await ethers.getContractFactory("NFTSimple");
+  // const NFTSimple = await ethers.getContractFactory("NFTSimple");
   neverFightTwice = await NeverFightTwice.deploy(VRF_Coordinator_Addr, Link_Addr, keyhash)
-  nftSimple = await NFTSimple.deploy();
+  // nftSimple = await NFTSimple.deploy();
   alice = await deployer.getAddress()
   
   console.log("Alice",alice);
@@ -48,12 +48,12 @@ async function main() {
   console.log("VRF", VRF_Coordinator_Addr);
 
    // should mint NFT
-   await nftSimple.batchMint(alice.address, 3); // tokenId = 0 to 9
+  //  await nftSimple.batchMint(alice.address, 3); // tokenId = 0 to 9
 
-   let owner_0 = await nftSimple.ownerOf(0)
-   let owner_1 = await nftSimple.ownerOf(1)
-   let owner_9 = await nftSimple.ownerOf(9)
-   console.log("NFTs belong to", owner_0, owner_1, owner_9)
+  //  let owner_0 = await nftSimple.ownerOf(0)
+  //  let owner_1 = await nftSimple.ownerOf(1)
+  //  let owner_9 = await nftSimple.ownerOf(9)
+  //  console.log("NFTs belong to", owner_0, owner_1, owner_9)
 
   // let owner_0 = await nftSimple.ownerOf(0)
   // let owner_1 = await nftSimple.ownerOf(1)
