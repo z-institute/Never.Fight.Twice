@@ -235,6 +235,22 @@ module.exports = {
       },
       chainId: 42
     },
+    matic: {
+      url: "https://rpc-mumbai.maticvigil.com",
+      accounts: {
+        mnemonic: process.env.MNEMONIC,
+        initialIndex: 1 // cause chainlink hackathon account is the second one
+      },
+      chainId: 137
+    },
+    maticTestnet:{
+      url: "https://rpc-mumbai.matic.today",
+      accounts: {
+        mnemonic: process.env.MNEMONIC,
+        initialIndex: 1 // cause chainlink hackathon account is the second one
+      },
+      chainId: 80001
+    }
   },
   etherscan: {
     // Your API key for Etherscan
