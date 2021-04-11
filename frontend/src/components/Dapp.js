@@ -87,7 +87,7 @@ export class Dapp extends React.Component {
 
     // If the token data or the user's balance hasn't loaded yet, we show
     // a loading component.
-    if (!this.state.tokenData || !this.state.balance || !this.state.balanceNeverFightTwice || !this.state.tokenIds || !this.state.tokenIdsNeverFightTwice || !this.state.NFTs) {
+    if (!this.state.tokenData || !this.state.balance || !this.state.tokenIds || !this.state.NFTs) {
       return <Loading />;
     }
 
@@ -114,13 +114,13 @@ export class Dapp extends React.Component {
             {/* </p> */}
 
             <span>
-              The <a href={"https://rinkeby.etherscan.io/address/"+this.neverFightTwice.address}>NeverFightTwice contract</a> has a total of{" "}
+              You have{" "}<b>
+                {this.state.NFTs.length.toString()}
+              </b>{" "} {this.state.NFTs.length === 20? "or more ": ''} NFTs.The <a href={"https://rinkeby.etherscan.io/address/"+this.neverFightTwice.address}>NeverFightTwice contract</a> has a total of{" "}
               <b>
-                {this.state.balanceNeverFightTwice.toString()} {this.state.tokenData.symbol}
-              </b>. All previously lost NFTs are locked here. Bet now to win them all!
-              {/* {this.state.balanceNeverFightTwice.gt(0) && (
-                <div>The tokenIds are <b>{Array.from(this.state.tokenIdsNeverFightTwice).join(', ')}</b></div>
-                )} */}
+                {this.state.NFTs_NeverFightTwice.length.toString()}
+              </b>{" "}NFTs. All previously lost NFTs are locked here. Bet now to win them all!
+
             </span>
           </div>
         </div>
@@ -239,7 +239,7 @@ export class Dapp extends React.Component {
       .then(response => {
     const { memes } = response.data
     this.setState({ allMemeImgs: memes })
-    console.log(memes)
+    // console.log(memes)
     })
 
   }
@@ -356,14 +356,9 @@ export class Dapp extends React.Component {
   // TODO: change to update all of your NFT balance
   async _updateBalance() {
     const balance = await this.nftSimple.balanceOf(this.state.selectedAddress);
-    const balanceNeverFightTwice = await this.nftSimple.balanceOf(this.neverFightTwice.address);
     let tokenIds = await this.listTokensOfOwner({
       token: this.nftSimple.address, 
       account: this.state.selectedAddress
-    })
-    let tokenIdsNeverFightTwice = await this.listTokensOfOwner({
-      token: this.nftSimple.address, 
-      account: this.neverFightTwice.address
     })
     // get all NFTs
     // let response = await fetch(`https://api.opensea.io/api/v1/assets?owner=${this.state.selectedAddress}&order_direction=desc&offset=0&limit=20`, options);
@@ -409,7 +404,7 @@ export class Dapp extends React.Component {
     });
     
     // console.log(NFTs.length, commits.assets.length)
-    this.setState({ balance: balance,  balanceNeverFightTwice: balanceNeverFightTwice, tokenIds: tokenIds, tokenIdsNeverFightTwice: tokenIdsNeverFightTwice, NFTs: NFTs, NFTs_NeverFightTwice: NFTs_NeverFightTwice});
+    this.setState({ balance: balance, tokenIds: tokenIds, NFTs: NFTs, NFTs_NeverFightTwice: NFTs_NeverFightTwice});
     console.log('updated balance')
   }
 
@@ -512,7 +507,7 @@ export class Dapp extends React.Component {
         nftContractAddr: this.nftSimple.address,
         thumbnail: '',
         openseaLink: '',
-        tokenId: receipt.events[0].args[2].toNumber()
+        tokenId: receipt.events[0].args[2]
       })});
       
       
