@@ -34,7 +34,7 @@ npm install
 3. Run the frontend
 ```
 cd frontend
-npm install
+npm install --legacy-peer-deps
 npm start
 ```
 4. Go to http://localhost:3000/ and switch to Rinkeby testnet on MetaMask
