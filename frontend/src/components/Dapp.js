@@ -199,10 +199,10 @@ export class Dapp extends React.Component {
   async _connectWallet() {
     const [selectedAddress] = await window.ethereum.enable();
 
-    // First we check the network is 8545
-    // if (!this._checkNetwork()) {
-    //   return;
-    // }
+    // First we check the network is Rinkeby
+    if (!this._checkNetwork()) {
+      return;
+    }
 
     this._initialize(selectedAddress);
 
@@ -552,17 +552,16 @@ export class Dapp extends React.Component {
     this.setState(this.initialState);
   }
 
-  // This method checks if Metamask selected network is Localhost:8545 
-  // _checkNetwork() {
-  //   if (window.ethereum.networkVersion === HARDHAT_NETWORK_ID || window.ethereum.networkVersion === '42') { // kovan
-  //     return true;
-  //   }
-  //   console.log(window.ethereum.networkVersion, HARDHAT_NETWORK_ID)
+  // This method checks if Metamask selected network is Rinkeby
+  _checkNetwork() {
+    if (window.ethereum.networkVersion === HARDHAT_NETWORK_ID || window.ethereum.networkVersion === '4') { 
+      return true;
+    }
 
-  //   this.setState({ 
-  //     networkError: 'Please connect Metamask to Localhost:8545'
-  //   });
+    this.setState({ 
+      networkError: 'Please connect Metamask to Rinkeby or Localhost:8545'
+    });
 
-  //   return false;
-  // }
+    return false;
+  }
 }
