@@ -10,20 +10,20 @@ export function Mint({mint,tokenSymbol}){
           // form's data.
           event.preventDefault();
           const formData = new FormData(event.target);
-          const tokenID = formData.get("tokenID");
+          const number = formData.get("number");
 
-          if (tokenID) {
-            mint(tokenID);
+          if (number) {
+            mint(number);
           }
         }}
       >
         <div className="form-group">
-          <label>Give 1 TokenId of {tokenSymbol} and mint 10 NFTs</label>
+          <label>Give the number of {tokenSymbol} to mint</label>
           <input
             className="form-control"
             type="number"
             step="1"
-            name="tokenID"
+            name="number"
             placeholder="1"
             required
             />

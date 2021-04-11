@@ -36,15 +36,15 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
-  const NeverFightTwice = await ethers.getContractFactory("NeverFightTwice")
-  // const NFTSimple = await ethers.getContractFactory("NFTSimple");
-  neverFightTwice = await NeverFightTwice.deploy(VRF_Coordinator_Addr, Link_Addr, keyhash)
-  // nftSimple = await NFTSimple.deploy();
+  //const NeverFightTwice = await ethers.getContractFactory("NeverFightTwice")
+  const NFTSimple = await ethers.getContractFactory("NFTSimple");
+  //neverFightTwice = await NeverFightTwice.deploy(VRF_Coordinator_Addr, Link_Addr, keyhash)
+  nftSimple = await NFTSimple.deploy();
   alice = await deployer.getAddress()
   
   console.log("Alice",alice);
-  console.log("N.F.T",neverFightTwice.address);
-  // console.log("NFTSimple", nftSimple.address);
+  //console.log("N.F.T",neverFightTwice.address);
+  console.log("NFTSimple", nftSimple.address);
   console.log("VRF", VRF_Coordinator_Addr);
 
    // should mint NFT
@@ -73,14 +73,14 @@ function saveFrontendFiles() {
   }
 
   // const MockLinkArt = artifacts.readArtifactSync("MockLink");
-  const NeverFightTwiceArt = artifacts.readArtifactSync("NeverFightTwice");
-  // const NFTSimpleArt = artifacts.readArtifactSync("NFTSimple");
+  // const NeverFightTwiceArt = artifacts.readArtifactSync("NeverFightTwice");
+  const NFTSimpleArt = artifacts.readArtifactSync("NFTSimple");
   // const VRFCoordinatorMockArt = artifacts.readArtifactSync("VRFCoordinatorMock");
   // const ERC721Art = artifacts.readArtifactSync("ERC721");
 
   // fs.writeFileSync(contractsDir + "/MockLink.json",JSON.stringify(MockLinkArt, null, 2));
-  fs.writeFileSync(contractsDir + "/NeverFightTwice.json",JSON.stringify(NeverFightTwiceArt, null, 2));
-  // fs.writeFileSync(contractsDir + "/NFTSimple.json",JSON.stringify(NFTSimpleArt, null, 2));
+  // fs.writeFileSync(contractsDir + "/NeverFightTwice.json",JSON.stringify(NeverFightTwiceArt, null, 2));
+  fs.writeFileSync(contractsDir + "/NFTSimple.json",JSON.stringify(NFTSimpleArt, null, 2));
   // fs.writeFileSync(contractsDir + "/VRFCoordinatorMock.json",JSON.stringify(VRFCoordinatorMockArt, null, 2));
   // fs.writeFileSync(contractsDir + "/ERC721.json",JSON.stringify(ERC721Art, null, 2));
 }

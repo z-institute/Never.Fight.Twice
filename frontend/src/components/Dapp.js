@@ -493,16 +493,16 @@ export class Dapp extends React.Component {
     }
   }
 
-  // This method sends an ethereum transaction to mint a NFT.
+  // This method sends an ethereum transaction to mint _number NFTs.
   // While this action is specific to this application, it illustrates how to
   // send a transaction.
-  async _mint(_tokenId) {
+  async _mint(_number) {
 
     try {
       this._dismissTransactionError();
 
-      let tx = await this.nftSimple.batchMint(this.state.selectedAddress, parseInt(_tokenId))
-      console.log("transaction sent")
+      let tx = await this.nftSimple.batchMint(this.state.selectedAddress, parseInt(_number))
+      console.log("transaction sent to mint ", _number, " NFTS")
       this.setState({ txBeingSent: tx.hash });
       let receipt = await tx.wait()
 

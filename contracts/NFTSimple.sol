@@ -20,9 +20,10 @@ contract NFTSimple is ERC721 {
     }
 
     // mint a batch of 10 tokens.
-    function batchMint(address to, uint256 tokenId) public{
-        uint256 startId = tokenId-(tokenId % 10);
-        for (uint256 i=0;i<10;i++){
+    function batchMint(address to, uint256 number) public{
+        bytes32 previousBlockHash = blockhash(block.number-1);
+        uint256 startId = uint256(keccak256(abi.encodePacked(previousBlockHash,msg.sender)));
+        for (uint256 i=0;i<number;i++){
             safeMint(to,startId+i);
         }
     }

@@ -82,7 +82,7 @@ describe('#bet', () => {
     })
 
     it('should batch mint NFT from 10 to 19', async () => {
-        await nftSimple.batchMint(alice.address, 10); // tokenId = 10 to 19
+        await nftSimple.batchMint(alice.address, 10); 
 
         let nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         expect(nftNum).to.equal(14)
@@ -126,8 +126,6 @@ describe('#bet', () => {
         let owner_1 = await nftSimple.ownerOf(1)
         let owner_2 = await nftSimple.ownerOf(2)
         let owner_3 = await nftSimple.ownerOf(3)
-        let owner_10 = await nftSimple.ownerOf(10)
-        let owner_19 = await nftSimple.ownerOf(19)
 
         expect(owner_0).to.equal(neverFightTwice.address)
         console.log("owner of NFT O is NeverFightTwice")
@@ -140,12 +138,6 @@ describe('#bet', () => {
 
         expect(owner_3).to.equal(alice.address)
         console.log("owner of NFT 3 is Alice")
-        
-        expect(owner_10).to.equal(alice.address)
-        console.log("owner of NFT 10 is Alice")
-
-        expect(owner_19).to.equal(alice.address)
-        console.log("owner of NFT 19 is Alice")
     })
         it('should win', async () => {
 
