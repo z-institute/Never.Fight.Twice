@@ -20,6 +20,10 @@ If the VRF coordinator returns an odd number, and there is at least one NFT in t
 - NeverFightTwice: [0x2DC272108F86832b59eb46ecfD5c117601d6b58e](https://kovan.etherscan.io/address/0x2DC272108F86832b59eb46ecfD5c117601d6b58e#code)
 - NFTSimple: [0xB40698744C409069e3dbC90172dB91EDa0D02ac1](https://kovan.etherscan.io/address/0xB40698744C409069e3dbC90172dB91EDa0D02ac1#code)
 
+### Mumbai Testnet
+- NeverFightTwice: [0x578F794a5443703D51867b34EDD0173a17ce3925](https://explorer-mumbai.maticvigil.com/address/0x578F794a5443703D51867b34EDD0173a17ce3925)
+- NFTSimple: [0x462b11b6e647C92a13d2f9F45fc91ac10bCb2538](https://explorer-mumbai.maticvigil.com/address/0x462b11b6e647C92a13d2f9F45fc91ac10bCb2538)
+
 ## Overview
 The contracts are in `contracts/` folder, named `NeverFightTwice.sol` and `NFTSimple.sol`. The deploy scripts are in `scripts/`. Check `test/NeverFightTwice.test.js` to understand the working flow. The core frontend code is in `frontend/src/components/Dapp.js`.
 
@@ -59,6 +63,7 @@ npx hardhat node
 npx hardhat run scripts/deploy.js --network localhost
 // npx hardhat run scripts/deploy_rinkeby.js --network rinkeby
 // npx hardhat run scripts/deploy_kovan.js --network kovan
+// npx hardhat run scripts/deploy_matic.js --network maticTestnet
 ```
 5. Verify the contracts
 ```
@@ -69,6 +74,12 @@ npx hardhat verify --network rinkeby 0xd293eF32c95a786A3921c57D8AD676f77915873b 
 npx hardhat verify --network rinkeby 0x193c9bE4D9bb1d5dd7C79606015C2746a4cDa235 
 
 // npx hardhat verify --network rinkeby DEPLOYED_CONTRACT_ADDRESS "Constructor argument 1" "Constructor argument 2"
+
+// NeverFightTwice
+npx hardhat verify --network maticTestnet 0x578F794a5443703D51867b34EDD0173a17ce3925 0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B 0xa36085F69e2889c224210F603D836748e7dC0088 0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311
+
+// NFTSimple
+npx hardhat verify --network maticTestnet 0x193c9bE4D9bb1d5dd7C79606015C2746a4cDa235 
 ```
 6. Send LINK to NeverFightTwice contract!!!! [ALWAYS FORGET]
 7. Import the private key of the first account into MetaMask and later connect wallet using this address.
