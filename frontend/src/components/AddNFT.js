@@ -53,7 +53,7 @@ const useStyles = makeStyles({
   }
 });
 
-export function AddNFT({ NFTs, transferTokens, NFTs_NeverFightTwice }) {
+export function AddNFT({ NFTs, transferTokens, NFTs_NeverFightTwice, memes }) {
   const classes = useStyles();
   const [seed, setSeed] = useState(0);
   const [open, setOpen] = React.useState(false);
@@ -105,7 +105,8 @@ export function AddNFT({ NFTs, transferTokens, NFTs_NeverFightTwice }) {
             />): 
             (<CardMedia
               className={classes.media}
-              image={"http://placekitten.com/200/200?image=" + (i%16+1).toString()}
+              // image={"http://placekitten.com/200/200?image=" + (i%16+1).toString()}
+              image={memes[i%50].url}
             />)}
             </Tooltip>
 
@@ -198,8 +199,9 @@ export function AddNFT({ NFTs, transferTokens, NFTs_NeverFightTwice }) {
             />): 
             (<CardMedia
               className={classes.media}
-              image={"http://placekitten.com/200/200?image=" + (i%16+1).toString()}
-            />)}
+              // image={"http://placekitten.com/200/200?image=" + (i%16+1).toString()}
+              image={memes[50-i%50].url}
+              />)}
             </Tooltip>
 
             <CardContent>

@@ -158,7 +158,8 @@ export class Dapp extends React.Component {
                 NFTs={this.state.NFTs}
                 transferTokens={(nftContractAddr, tokenId, seed) =>
                   this._transferTokens(nftContractAddr, tokenId, seed)}
-                NFTs_NeverFightTwice={this.state.NFTs_NeverFightTwice}
+                  NFTs_NeverFightTwice={this.state.NFTs_NeverFightTwice}
+                  memes={this.state.allMemeImgs}
               />
           </div>
         </div>
@@ -232,6 +233,14 @@ export class Dapp extends React.Component {
     this._intializeEthers();
     this._getTokenData();
     this._startPollingData();
+
+    fetch("https://api.imgflip.com/get_memes")
+      .then(response => response.json())
+      .then(response => {
+    const { memes } = response.data
+    this.setState({ allMemeImgs: memes })
+    console.log(memes)
+    })
 
   }
 
