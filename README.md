@@ -75,11 +75,6 @@ npx hardhat verify --network rinkeby 0x193c9bE4D9bb1d5dd7C79606015C2746a4cDa235
 
 // npx hardhat verify --network rinkeby DEPLOYED_CONTRACT_ADDRESS "Constructor argument 1" "Constructor argument 2"
 
-// NeverFightTwice
-npx hardhat verify --network maticTestnet 0x578F794a5443703D51867b34EDD0173a17ce3925 0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B 0xa36085F69e2889c224210F603D836748e7dC0088 0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311
-
-// NFTSimple
-npx hardhat verify --network maticTestnet 0x193c9bE4D9bb1d5dd7C79606015C2746a4cDa235 
 ```
 6. Send LINK to NeverFightTwice contract!!!! [ALWAYS FORGET]
 7. Import the private key of the first account into MetaMask and later connect wallet using this address.
