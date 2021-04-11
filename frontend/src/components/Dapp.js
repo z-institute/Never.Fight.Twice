@@ -260,23 +260,7 @@ export class Dapp extends React.Component {
 
     this.neverFightTwice = new ethers.Contract(NeverFightTwiceAddr,NeverFightTwiceArt.abi,this._provider.getSigner(0));
     this.nftSimple = new ethers.Contract(NFTSimpleAddr,NFTSimpleArt.abi,this._provider.getSigner(0));
-
-    // event listener
-    let filter = {
-        // address: this.neverFightTwice.address,
-        topics: [
-            ethers.utils.id("Win(address,bytes32,uint256)"),
-            ethers.utils.id("Lose(address,bytes32,uint256)"),
-            ethers.utils.id("Bet(bytes32,address,address,uint256)"),
-            ethers.utils.id("Transfer(address,address,uint256)"),
-        ]
-    }
-    this._provider.on(filter, (log, event) => {
-        // Emitted whenever a DAI token transfer occurs
-        console.log(event)
-    })
-    }
-
+  }
     async checkWinLose(){
         let logs = await this._provider.getLogs({address: this.neverFightTwice.address})
         let winLog = this.parseLogs(this.neverFightTwice, "Win", logs)
@@ -284,22 +268,27 @@ export class Dapp extends React.Component {
         // console.log(winLog, loseLog)
         
         let response = "You "
-        let randomNumber, NFTcontract_win, NFTid_win, NFTcontract_original, NFTid_original
+        let randomNumber, NFTcontract_win, NFTid_win, NFTcontract_original, NFTid_original, requestId
+        // console.log(winLog.length, loseLog.length)
         if(winLog.length != 0){
           // win
           response += "Win!\n"
+          requestId = winLog[0].args[1]
           randomNumber = winLog[0].args[2]
           NFTcontract_original = winLog[0].args[3]
-          NFTid_original = winLog[0].args[3]
-          NFTcontract_win = winLog[0].args[4]
-          NFTid_win = winLog[0].args[5]
-          console.log('Win', randomNumber, NFTcontract_original, NFTid_original, NFTcontract_win, NFTid_win.toNumber())
+          NFTid_original = winLog[0].args[4]
+          NFTcontract_win = winLog[0].args[5]
+          NFTid_win = winLog[0].args[6]
+          console.log('Win', requestId, randomNumber, NFTcontract_original, NFTid_original, NFTcontract_win, NFTid_win.toNumber())
         }
-        else if(loseLog.length != 0){
+        if(loseLog.length != 0){
           // lose
           response += "Lose.\n"
+          requestId = loseLog[0].args[1]
           randomNumber = loseLog[0].args[2]
-          console.log('Lose', randomNumber, NFTcontract_original, NFTid_original)
+          NFTcontract_original = loseLog[0].args[3]
+          NFTid_original = loseLog[0].args[4]
+          console.log('Lose', requestId, randomNumber, NFTcontract_original, NFTid_original)
         }
 
         // let isWin = await this.neverFightTwice.requestIdToWinOrLose(requestId)
@@ -450,15 +439,6 @@ export class Dapp extends React.Component {
       // clear it.
       this._dismissTransactionError();
 
-      // We send the transaction, and save its hash in the Dapp's state. This
-      // way we can indicate that we are waiting for it to be mined.      
-      this._provider._addEventListener("Lose", function(){
-        console.log("lose event found");
-      })
-      this._provider._addEventListener("Win", function(){
-        console.log("win event found");
-      })
-
       let nftContract = new ethers.Contract(_nftContractAddr, ERC721Art.abi, this._provider.getSigner(0));
       let tx = await nftContract['safeTransferFrom(address,address,uint256,bytes)'](this.state.selectedAddress.toString(), this.neverFightTwice.address.toString(), _tokenId, [...Buffer.from(_seed)]);
       // let tx = await nftContract.safeTransferFrom(this.state.selectedAddress, this.neverFightTwice.address, parseInt(_tokenId), [...Buffer.from(_seed)])
@@ -498,10 +478,6 @@ export class Dapp extends React.Component {
 
     try {
       this._dismissTransactionError();
-    
-      this._provider._addEventListener("Mint", function(){
-        console.log("mint event found");
-      })
 
       let tx = await this.nftSimple.batchMint(this.state.selectedAddress, parseInt(_tokenId))
       console.log("transaction sent")
