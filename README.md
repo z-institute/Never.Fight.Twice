@@ -91,3 +91,4 @@ This project is modified from https://github.com/pappas999/chainlink-hardhat-box
 - See how opensea api can speed up to update the NFT balance after mint
 - Display which tokenId has been used and which is not 
 - Add waiting for the bet result screen & win or lose
+- Show random 3 of the user's NFTs and random 3 of N.F.T's NFTs. (may use [react paginate](https://www.npmjs.com/package/react-paginate))
