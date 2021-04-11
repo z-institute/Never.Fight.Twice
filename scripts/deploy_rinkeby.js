@@ -47,16 +47,13 @@ async function main() {
   // console.log("NFTSimple", nftSimple.address);
   console.log("VRF", VRF_Coordinator_Addr);
 
-  // should mint NFT
-  // await nftSimple.mint(alice, 0); // tokenId = 0
-  // await nftSimple.mint(alice, 1); // tokenId = 1
-  // await nftSimple.mint(alice, 2); // tokenId = 2
-  // await nftSimple.mint(alice, 3); // tokenId = 3
-  // await nftSimple.mint(alice, 4); // tokenId = 3
-  // await nftSimple.mint(alice, 5); // tokenId = 3
-  // await nftSimple.mint(alice, 6); // tokenId = 3
-  // await nftSimple.mint(alice, 7); // tokenId = 3
-  // await nftSimple.mint(alice, 8); // tokenId = 3
+   // should mint NFT
+   await nftSimple.batchMint(alice.address, 3); // tokenId = 0 to 9
+
+   let owner_0 = await nftSimple.ownerOf(0)
+   let owner_1 = await nftSimple.ownerOf(1)
+   let owner_9 = await nftSimple.ownerOf(9)
+   console.log("NFTs belong to", owner_0, owner_1, owner_9)
 
   // let owner_0 = await nftSimple.ownerOf(0)
   // let owner_1 = await nftSimple.ownerOf(1)

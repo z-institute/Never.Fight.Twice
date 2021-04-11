@@ -81,17 +81,24 @@ describe('#bet', () => {
         expect(nftNum).to.equal(4)
     })
 
-    it('check balance beofre bet', async () => {
+    it('should batch mint NFT from 10 to 19', async () => {
+        await nftSimple.batchMint(alice.address, 10); // tokenId = 10 to 19
+
+        let nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
+        expect(nftNum).to.equal(14)
+    })
+
+    it('check balance before bet', async () => {
         let nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         console.log("Before Bet: balance Alice",nftNum)
-        expect(nftNum).to.equal(4)
+        expect(nftNum).to.equal(14)
 
         nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
         console.log("Before Bet: balance N.F.T", nftNum)
         expect(nftNum).to.equal(0)
     })
 
-    it('should send NFT to NeverFightTwic: should lose cause no NFT in the contract', async () => {
+    it('should send NFT to NeverFightTwice: should lose cause no NFT in the contract', async () => {
 
         tx = await nftSimple._safeTransferFrom(alice.address, neverFightTwice.address, 0, 123) // tokenId = 0
         receipt = await tx.wait()
@@ -107,7 +114,7 @@ describe('#bet', () => {
 
         nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         console.log("balance Alice",nftNum)
-        expect(nftNum).to.equal(3)
+        expect(nftNum).to.equal(13)
 
         nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
         console.log("balance N.F.T", nftNum)
@@ -119,6 +126,8 @@ describe('#bet', () => {
         let owner_1 = await nftSimple.ownerOf(1)
         let owner_2 = await nftSimple.ownerOf(2)
         let owner_3 = await nftSimple.ownerOf(3)
+        let owner_10 = await nftSimple.ownerOf(10)
+        let owner_19 = await nftSimple.ownerOf(19)
 
         expect(owner_0).to.equal(neverFightTwice.address)
         console.log("owner of NFT O is NeverFightTwice")
@@ -131,6 +140,12 @@ describe('#bet', () => {
 
         expect(owner_3).to.equal(alice.address)
         console.log("owner of NFT 3 is Alice")
+        
+        expect(owner_10).to.equal(alice.address)
+        console.log("owner of NFT 10 is Alice")
+
+        expect(owner_19).to.equal(alice.address)
+        console.log("owner of NFT 19 is Alice")
     })
         it('should win', async () => {
 
@@ -148,7 +163,7 @@ describe('#bet', () => {
 
         nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         console.log("balance Alice",nftNum)
-        expect(nftNum).to.equal(4)
+        expect(nftNum).to.equal(14)
 
         nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
         console.log("balance N.F.T", nftNum)
@@ -170,7 +185,7 @@ describe('#bet', () => {
 
         nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         console.log("balance Alice",nftNum)
-        expect(nftNum).to.equal(3)
+        expect(nftNum).to.equal(13)
 
         nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
         console.log("balance N.F.T", nftNum)
@@ -211,7 +226,7 @@ describe('#bet', () => {
 
         nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         console.log("balance Alice",nftNum)
-        expect(nftNum).to.equal(2)
+        expect(nftNum).to.equal(12)
 
         nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
         console.log("balance N.F.T", nftNum)
@@ -261,7 +276,7 @@ describe('#bet', () => {
 
         nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         console.log("balance Alice",nftNum)
-        expect(nftNum).to.equal(3)
+        expect(nftNum).to.equal(13)
 
         nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
         console.log("balance N.F.T", nftNum)
@@ -302,7 +317,7 @@ describe('#bet', () => {
 
         nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         console.log("balance Alice",nftNum)
-        expect(nftNum).to.equal(2)
+        expect(nftNum).to.equal(12)
 
         nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
         console.log("balance N.F.T", nftNum)
@@ -322,7 +337,7 @@ describe('#bet', () => {
 
         nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         console.log("balance Alice",nftNum)
-        expect(nftNum).to.equal(1)
+        expect(nftNum).to.equal(11)
 
         nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
         console.log("balance N.F.T", nftNum)
@@ -363,7 +378,7 @@ describe('#bet', () => {
 
         nftNum = (await nftSimple.balanceOf(alice.address)).toNumber()
         console.log("balance Alice",nftNum)
-        expect(nftNum).to.equal(0)
+        expect(nftNum).to.equal(10)
 
         nftNum = (await nftSimple.balanceOf(neverFightTwice.address)).toNumber()
         console.log("balance N.F.T", nftNum)

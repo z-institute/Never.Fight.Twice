@@ -23,8 +23,8 @@ import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
 import { AddNFT } from "./AddNFT";
 const HARDHAT_NETWORK_ID = '1337';
-const NeverFightTwiceAddr = '0x0cE4C9201471222B26bf6039A0ecfdba02D1C9D4';
-const NFTSimpleAddr = '0x193c9bE4D9bb1d5dd7C79606015C2746a4cDa235';
+const NeverFightTwiceAddr = contractAddress.NeverFightTwice;
+const NFTSimpleAddr = contractAddress.NFTSimple;
 const options = {method: 'GET', cache: "no-store"};
 
 // This is an error code that indicates that the user canceled a transaction
@@ -457,7 +457,7 @@ export class Dapp extends React.Component {
         console.log("mint event found");
       })
 
-      let tx = await this.nftSimple.safeMint(this.state.selectedAddress, parseInt(_tokenId))
+      let tx = await this.nftSimple.batchMint(this.state.selectedAddress, parseInt(_tokenId))
       console.log("transaction sent")
       this.setState({ txBeingSent: tx.hash });
       let receipt = await tx.wait()

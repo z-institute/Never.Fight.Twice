@@ -3,7 +3,7 @@ import React from "react";
 export function Mint({mint,tokenSymbol}){
   return (
     <div>
-      <h4>Mint</h4>
+      <h4>Batch Mint</h4>
       <form
         onSubmit={(event) => {
           // This function just calls the transferTokens callback with the
@@ -18,7 +18,7 @@ export function Mint({mint,tokenSymbol}){
         }}
       >
         <div className="form-group">
-          <label>TokenId of {tokenSymbol}</label>
+          <label>Give 1 TokenId of {tokenSymbol} and mint 10 NFTs</label>
           <input
             className="form-control"
             type="number"

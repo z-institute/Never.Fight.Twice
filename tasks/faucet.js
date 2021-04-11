@@ -30,9 +30,9 @@ task("faucet", "Sends ETH and tokens to an address")
       return;
     }
 
-    let nftNumber = 123
+    let nftNumber = 1234
     const nftSimple = await ethers.getContractAt("NFTSimple", address.NFTSimple);
-    await nftSimple.mint(receiver, nftNumber);
+    await nftSimple.batchMint(receiver, nftNumber);
 
     const token = await ethers.getContractAt("MockLink", address.MockLink);
     const [sender] = await ethers.getSigners();
@@ -46,5 +46,5 @@ task("faucet", "Sends ETH and tokens to an address")
     });
     await tx2.wait();
 
-    console.log(`Transferred 1 ETH , 1 NTFS and 100 tokens to ${receiver}`);
+    console.log(`Transferred 1 ETH , 10 NTFS and 100 tokens to ${receiver}`);
   });
