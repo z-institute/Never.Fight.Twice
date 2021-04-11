@@ -25,7 +25,7 @@ import { AddNFT } from "./AddNFT";
 const HARDHAT_NETWORK_ID = '1337';
 const NeverFightTwiceAddr = contractAddress.NeverFightTwice;
 const NFTSimpleAddr = contractAddress.NFTSimple;
-const options = {method: 'GET'};
+const options = {method: 'GET', cache: "no-store"};
 
 // This is an error code that indicates that the user canceled a transaction
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
@@ -90,7 +90,7 @@ export class Dapp extends React.Component {
 
     // If the token data or the user's balance hasn't loaded yet, we show
     // a loading component.
-    if (!this.state.tokenData || !this.state.balance || !this.state.balanceNeverFightTwice || !this.state.tokenIds || !this.state.tokenIdsNeverFightTwice || !this.NFTs) {
+    if (!this.state.tokenData || !this.state.balance || !this.state.balanceNeverFightTwice || !this.state.tokenIds || !this.state.tokenIdsNeverFightTwice || !this.state.NFTs) {
       return <Loading />;
     }
 
@@ -103,7 +103,7 @@ export class Dapp extends React.Component {
               {/* {this.state.tokenData.name} ({this.state.tokenData.symbol}) */}
               Never Fight Twice!
             </h1>
-            <p> Welcome <b>{this.state.selectedAddress}</b>! This is an NFT battlefield that can double your NFT or lose all!
+            <p> Welcome! This is an NFT battlefield that can double your NFT or lose all!
                 Send an NFT to the pool, and have a chance to win another NFT free or lose your NFT!
                 Challenge accepted?</p>
             {/* <p>
@@ -155,7 +155,7 @@ export class Dapp extends React.Component {
         <div className="row">
           <div className="col-12">
               <AddNFT
-                NFTs={this.NFTs}
+                NFTs={this.state.NFTs}
                 transferTokens={(nftContractAddr, tokenId, seed) =>
                   this._transferTokens(nftContractAddr, tokenId, seed)
                 }
@@ -245,31 +245,6 @@ export class Dapp extends React.Component {
     this._getTokenData();
     this._startPollingData();
 
-    // TODO: get all NFTs
-    this.NFTs = []
-    // let response = await fetch(`https://api.opensea.io/api/v1/assets?owner=${userAddress}&order_direction=desc&offset=0&limit=20`, options);
-    let response = await fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${userAddress}&order_direction=desc&offset=0&limit=20`, options);
-    let commits = await response.json();
-    // console.log(commits.assets)
-    let NFTs = []
-    commits.assets.forEach(function (item, index) {
-      NFTs.push({
-        name: item.name,
-        nftContractName: item.asset_contract.name,
-        nftContractAddr: item.asset_contract.address,
-        thumbnail: item.image_thumbnail_url,
-        openseaLink: item.permalink,
-        tokenId: item.token_id
-      })
-      // console.log(item.name, item.asset_contract.address, item.asset_contract.name, item.image_thumbnail_url, item.permalink)
-    });
-    this.NFTs = NFTs;
-    console.log(NFTs)
-
-    // fetch()
-    // .then(response => console.log(response))
-    // .catch(err => console.error(err));
-
   }
 
   async _intializeEthers() {
@@ -289,7 +264,7 @@ export class Dapp extends React.Component {
   // don't need to poll it. If that's the case, you can just fetch it when you
   // initialize the app, as we do with the token data.
   _startPollingData() {
-    this._pollDataInterval = setInterval(() => this._updateBalance(), 1000);
+    this._pollDataInterval = setInterval(() => this._updateBalance(), 10000);
 
     // We run it once immediately so we don't have to wait for it
     this._updateBalance();
@@ -311,7 +286,8 @@ export class Dapp extends React.Component {
     const name = await this.nftSimple.name();
     const symbol = await this.nftSimple.symbol();
 
-    this.setState({ tokenData: { name, symbol } });
+    this.setState({ tokenData: { name, symbol } })
+
   }
 
   hashCode (s) {
@@ -334,7 +310,24 @@ export class Dapp extends React.Component {
       token: this.nftSimple.address, 
       account: this.neverFightTwice.address
     })
-    this.setState({ balance: balance,  balanceNeverFightTwice: balanceNeverFightTwice, tokenIds: tokenIds, tokenIdsNeverFightTwice: tokenIdsNeverFightTwice});
+    // get all NFTs
+    // let response = await fetch(`https://api.opensea.io/api/v1/assets?owner=${this.state.selectedAddress}&order_direction=desc&offset=0&limit=20`, options);
+    let response = await fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${this.state.selectedAddress}&order_direction=desc&offset=0&limit=20`, options);
+    let commits = await response.json();
+    // console.log(commits.assets)
+    let NFTs = []
+    commits.assets.forEach(function (item, index) {
+      NFTs.push({
+        name: item.name,
+        nftContractName: item.asset_contract.name,
+        nftContractAddr: item.asset_contract.address,
+        thumbnail: item.image_thumbnail_url,
+        openseaLink: item.permalink,
+        tokenId: item.token_id
+      })
+    });
+    // console.log(NFTs.length, commits.assets.length)
+    this.setState({ balance: balance,  balanceNeverFightTwice: balanceNeverFightTwice, tokenIds: tokenIds, tokenIdsNeverFightTwice: tokenIdsNeverFightTwice, NFTs: NFTs});
     console.log('updated balance')
   }
 
