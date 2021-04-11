@@ -8,7 +8,7 @@ import { ethers } from "ethers";
 import NeverFightTwiceArt from "../contracts/NeverFightTwice.json";
 import NFTSimpleArt from "../contracts/NFTSimple.json";
 import ERC721Art from "../contracts/ERC721.json";
-import contractAddress from "../contracts/contract-address.json";
+// import contractAddress from "../contracts/contract-address.json";
 
 // All the logic of this dapp is contained in the Dapp component.
 // These other components are just presentational ones: they don't have any
@@ -326,6 +326,15 @@ export class Dapp extends React.Component {
         tokenId: item.token_id
       })
     });
+    if(this.state.NFTs){
+      this.state.NFTs.filter(function (nft) { 
+        if(nft.openseaLink == '' && nft.nftContractName == 'NFTSimple'){
+          const found = NFTs.some(e => e.tokenId == nft.tokenId);
+          if (!found) NFTs.unshift(nft)
+        }
+     })
+    }
+    
     // console.log(NFTs.length, commits.assets.length)
     this.setState({ balance: balance,  balanceNeverFightTwice: balanceNeverFightTwice, tokenIds: tokenIds, tokenIdsNeverFightTwice: tokenIdsNeverFightTwice, NFTs: NFTs});
     console.log('updated balance')
@@ -391,7 +400,7 @@ export class Dapp extends React.Component {
       console.log("transaction sent")
       this.setState({ txBeingSent: tx.hash });
       let receipt = await tx.wait()
-      // let requestId = receipt.events[5].data.substring(0,66)
+      let requestId = receipt.events[5].data.substring(0,66)
       
       if (receipt.status === 0) {
         throw new Error("Transaction failed");
@@ -400,8 +409,21 @@ export class Dapp extends React.Component {
       // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, this.neverFightTwice.address)
       // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, this.neverFightTwice.address)
       // let randomNumber = await this.neverFightTwice.requestIdToRandomNumber(requestId)
-      // let randomNumber = await this.neverFightTwice.getRandomNumberFromRequestId(requestId)
-      // console.log(randomNumber.toNumber())
+      // setTimeout(async function(){ 
+      //   let response = "You "
+      //   let isWin = await this.neverFightTwice.requestIdToWinOrLose(requestId)
+      //   response += isWin? 'Win!\n': 'Lose!\n'
+      //   let randomNumber = await this.neverFightTwice.getRandomNumberFromRequestId(requestId)
+      //   response += 'The random number was '+randomNumber.toNumber().toString()
+      //   if(isWin){
+      //     let winTokenId = await this.neverFightTwice.requestIdToWinTokenId(requestId)
+      //     let winNFTcontract = await this.neverFightTwice.requestIdToWinNFTcontract(requestId)
+      //     response += `\nThe tokenId you won: ${winTokenId}, NFT contract: ${winNFTcontract}`
+      //   }
+        
+      //   alert(response); 
+      // }, 10000); // 10 seconds
+      
 
       await this._updateBalance();
 
@@ -429,49 +451,43 @@ export class Dapp extends React.Component {
   async _mint(_tokenId) {
 
     try {
-      // If a transaction fails, we save that error in the component's state.
-      // We only save one such error, so before sending a second transaction, we
-      // clear it.
       this._dismissTransactionError();
-
-      // We send the transaction, and save its hash in the Dapp's state. This
-      // way we can indicate that we are waiting for it to be mined.      
+    
       this._provider._addEventListener("Mint", function(){
-        console.log("mint  event found");
+        console.log("mint event found");
       })
 
       let tx = await this.nftSimple.safeMint(this.state.selectedAddress, parseInt(_tokenId))
       console.log("transaction sent")
       this.setState({ txBeingSent: tx.hash });
       let receipt = await tx.wait()
-      // let requestId = receipt.events[5].data.substring(0,66)
+
+      this.setState({ NFTs: this.state.NFTs.concat({
+        name: '',
+        nftContractName: 'NFTSimple',
+        nftContractAddr: this.nftSimple.address,
+        thumbnail: '',
+        openseaLink: '',
+        tokenId: receipt.events[0].args[2].toNumber()
+      })});
+      
       
       if (receipt.status === 0) {
         throw new Error("Transaction failed");
       }
 
-      // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, this.neverFightTwice.address)
-      // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, this.neverFightTwice.address)
-      // let randomNumber = await this.neverFightTwice.requestIdToRandomNumber(requestId)
-      // let randomNumber = await this.neverFightTwice.getRandomNumberFromRequestId(requestId)
-      // console.log(randomNumber.toNumber())
-
       await this._updateBalance();
 
     } catch (error) {
-      // We check the error code to see if this error was produced because the
-      // user rejected a tx. If that's the case, we do nothing.
+    
       if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
         return;
       }
 
-      // Other errors are logged and stored in the Dapp's state. This is used to
-      // show them to the user, and for debugging.
       console.error(error);
       this.setState({ transactionError: error });
     } finally {
-      // If we leave the try/catch, we aren't sending a tx anymore, so we clear
-      // this part of the state.
+
       this.setState({ txBeingSent: undefined });
     }
   }

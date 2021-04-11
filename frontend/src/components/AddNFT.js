@@ -96,7 +96,7 @@ export function AddNFT({ NFTs, transferTokens }) {
           <TextField
             autoFocus
             margin="dense"
-            id="seed"
+            id={i.toString()}
             label="Random Seed"
             fullWidth
             onChange={e => setSeed(e.target.value)}
