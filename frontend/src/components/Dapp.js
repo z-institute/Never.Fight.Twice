@@ -254,7 +254,22 @@ export class Dapp extends React.Component {
 
     this.neverFightTwice = new ethers.Contract(NeverFightTwiceAddr,NeverFightTwiceArt.abi,this._provider.getSigner(0));
     this.nftSimple = new ethers.Contract(NFTSimpleAddr,NFTSimpleArt.abi,this._provider.getSigner(0));
-  }
+
+    // event listener
+    let filter = {
+        // address: this.neverFightTwice.address,
+        topics: [
+            ethers.utils.id("Win(address,bytes32,uint256)"),
+            ethers.utils.id("Lose(address,bytes32,uint256)"),
+            ethers.utils.id("Bet(bytes32,address,address,uint256)"),
+            ethers.utils.id("Transfer(address,address,uint256)"),
+        ]
+    }
+    this._provider.on(filter, (log, event) => {
+        // Emitted whenever a DAI token transfer occurs
+        console.log(event)
+    })
+    }
 
   // The next to methods are needed to start and stop polling data. While
   // the data being polled here is specific to this example, you can use this
@@ -390,9 +405,12 @@ export class Dapp extends React.Component {
 
       // We send the transaction, and save its hash in the Dapp's state. This
       // way we can indicate that we are waiting for it to be mined.      
-      // this._provider._addEventListener("Lose", function(){
-      //   console.log("lose event found");
-      // })
+      this._provider._addEventListener("Lose", function(){
+        console.log("lose event found");
+      })
+      this._provider._addEventListener("Win", function(){
+        console.log("win event found");
+      })
 
       let nftContract = new ethers.Contract(_nftContractAddr, ERC721Art.abi, this._provider.getSigner(0));
       let tx = await nftContract['safeTransferFrom(address,address,uint256,bytes)'](this.state.selectedAddress.toString(), this.neverFightTwice.address.toString(), _tokenId, [...Buffer.from(_seed)]);

@@ -90,3 +90,4 @@ This project is modified from https://github.com/pappas999/chainlink-hardhat-box
 - Generate random pixel images when mint 
 - See how opensea api can speed up to update the NFT balance after mint
 - Display which tokenId has been used and which is not 
+- Add waiting for the bet result screen & win or lose
