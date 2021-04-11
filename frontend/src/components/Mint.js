@@ -1,9 +1,25 @@
-import React from "react";
+import React, {useState } from "react";
+import {CopyToClipboard} from 'react-copy-to-clipboard';
+import Button from '@material-ui/core/Button';
 
-export function Mint({mint,tokenSymbol}){
+export function Mint({mint,tokenSymbol,tokenContractAddr}){
+  const [copied, setCopied] = useState(false);
+
   return (
     <div>
       <h4>Mint Some Free NFTs to Bet? 🤯</h4>
+      <span style={{color: 'gray'}}>Add <a href={'https://rinkeby.etherscan.io/address/'+tokenContractAddr} target='_blank'>NFTS</a>{" to MetaMask via Add Token > Custom Token and paste Token Contract Address. "} <CopyToClipboard text={tokenContractAddr}
+          onCopy={() => {
+            setCopied(true)
+            setTimeout(()=>{
+              setCopied(false)
+            }, 2000)
+          }}>
+          <Button size="small" variant="contained" style={{color: 'grey'}}>Copy Address</Button>
+
+        </CopyToClipboard>{" "}
+        {copied ? <span style={{color: 'black'}}>Copied!</span> : null}</span>
+      
       <form
         onSubmit={(event) => {
           // This function just calls the transferTokens callback with the

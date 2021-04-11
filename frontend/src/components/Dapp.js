@@ -177,6 +177,7 @@ export class Dapp extends React.Component {
                   this._mint(tokenId)
                 }
                 tokenSymbol={this.state.tokenData.symbol}
+                tokenContractAddr={this.nftSimple.address}
               />
             )}
           </div>

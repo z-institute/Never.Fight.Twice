@@ -13,6 +13,7 @@
     "@testing-library/user-event": "^7.2.1",
     "bootstrap": "^4.4.1",
     "react": "^16.13.1",
+    "react-copy-to-clipboard": "^5.0.3",
     "react-dom": "^16.13.1",
     "react-material-ui-carousel": "^2.2.4",
     "react-multi-carousel": "^2.6.2",
