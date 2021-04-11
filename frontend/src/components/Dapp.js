@@ -114,17 +114,19 @@ export class Dapp extends React.Component {
             {/* </p> */}
 
             <span>
-              The <a href={"https://rinkeby.etherscan.io/address/"+this.neverFightTwice.address}>NeverFightTwice contract</a> has{" "}
+              The <a href={"https://rinkeby.etherscan.io/address/"+this.neverFightTwice.address}>NeverFightTwice contract</a> has a total of{" "}
               <b>
                 {this.state.balanceNeverFightTwice.toString()} {this.state.tokenData.symbol}
-              </b>. {this.state.balanceNeverFightTwice.gt(0) && (
+              </b>. All previously lost NFTs are locked here. Bet now to win them all!
+              {/* {this.state.balanceNeverFightTwice.gt(0) && (
                 <div>The tokenIds are <b>{Array.from(this.state.tokenIdsNeverFightTwice).join(', ')}</b></div>
-                )}
+                )} */}
             </span>
           </div>
         </div>
 
         <hr />
+        <br />
 
         <div className="row">
           <div className="col-12">
@@ -152,15 +154,15 @@ export class Dapp extends React.Component {
 
         <div className="row">
           <div className="col-12">
-
               <AddNFT
                 NFTs={this.state.NFTs}
                 transferTokens={(nftContractAddr, tokenId, seed) =>
-                  this._transferTokens(nftContractAddr, tokenId, seed)
-                }
+                  this._transferTokens(nftContractAddr, tokenId, seed)}
+                NFTs_NeverFightTwice={this.state.NFTs_NeverFightTwice}
               />
           </div>
         </div>
+        <br />
 
         <div className="row">
           <div className="col-12">
@@ -378,9 +380,27 @@ export class Dapp extends React.Component {
         }
      })
     }
+
+
+
+    ////////////
+    response = await fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${this.neverFightTwice.address}&order_direction=desc&offset=0&limit=20`, options);
+    commits = await response.json();
+    // console.log(commits.assets)
+    let NFTs_NeverFightTwice = []
+    commits.assets.forEach(function (item, index) {
+      NFTs_NeverFightTwice.push({
+        name: item.name,
+        nftContractName: item.asset_contract.name,
+        nftContractAddr: item.asset_contract.address,
+        thumbnail: item.image_thumbnail_url,
+        openseaLink: item.permalink,
+        tokenId: item.token_id
+      })
+    });
     
     // console.log(NFTs.length, commits.assets.length)
-    this.setState({ balance: balance,  balanceNeverFightTwice: balanceNeverFightTwice, tokenIds: tokenIds, tokenIdsNeverFightTwice: tokenIdsNeverFightTwice, NFTs: NFTs});
+    this.setState({ balance: balance,  balanceNeverFightTwice: balanceNeverFightTwice, tokenIds: tokenIds, tokenIdsNeverFightTwice: tokenIdsNeverFightTwice, NFTs: NFTs, NFTs_NeverFightTwice: NFTs_NeverFightTwice});
     console.log('updated balance')
   }
 
@@ -438,7 +458,7 @@ export class Dapp extends React.Component {
       console.log("transaction sent")
       this.setState({ txBeingSent: tx.hash });
       let receipt = await tx.wait()
-      let requestId = receipt.events[5].data.substring(0,66)
+      // let requestId = receipt.events[5].data.substring(0,66)
       
       if (receipt.status === 0) {
         throw new Error("Transaction failed");
