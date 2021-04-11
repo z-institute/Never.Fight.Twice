@@ -30,9 +30,6 @@ const options = {method: 'GET', cache: "no-store"};
 // This is an error code that indicates that the user canceled a transaction
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
 
-const RANDOM_NUMBER_VRF_WIN = '777' // odd to win
-const RANDOM_NUMBER_VRF_LOSE = '778' // to lose
-
 // This component is in charge of doing these things:
 //   1. It connects to the user's wallet
 //   2. Initializes ethers and the Token contract
@@ -209,6 +206,14 @@ export class Dapp extends React.Component {
     this._stopPollingData();
   }
 
+  parseLogs(contract, eventName, logs) {
+    let event = contract.interface.getEvent(eventName)
+    let topic = contract.interface.getEventTopic(eventName)
+
+    return logs.filter(log => log.topics[0]===topic && contract.address===log.address)
+       .map(log => contract.interface.parseLog(log))
+  }
+
   async _connectWallet() {
     const [selectedAddress] = await window.ethereum.enable();
 
@@ -271,6 +276,26 @@ export class Dapp extends React.Component {
     })
     }
 
+    async checkWinLose(){
+        let response = "You "
+        let logs = await this._provider.getLogs({address: this.neverFightTwice.address})
+        let winLog = this.parseLogs(this.neverFightTwice, "Win", logs)
+        let loseLog = this.parseLogs(this.neverFightTwice, "Lose", logs)
+        let betLog = this.parseLogs(this.neverFightTwice, "Bet", logs)
+        console.log(winLog, loseLog, betLog)
+        // let isWin = await this.neverFightTwice.requestIdToWinOrLose(requestId)
+        // response += isWin? 'Win!\n': 'Lose!\n'
+        // let randomNumber = await this.neverFightTwice.getRandomNumberFromRequestId(requestId)
+        // response += 'The random number was '+randomNumber.toNumber().toString()
+        // if(isWin){
+        //   let winTokenId = await this.neverFightTwice.requestIdToWinTokenId(requestId)
+        //   let winNFTcontract = await this.neverFightTwice.requestIdToWinNFTcontract(requestId)
+        //   response += `\nThe tokenId you won: ${winTokenId}, NFT contract: ${winNFTcontract}`
+        // }
+        
+        // alert(response);    
+    }
+
   // The next to methods are needed to start and stop polling data. While
   // the data being polled here is specific to this example, you can use this
   // pattern to read any data from your contracts.
@@ -279,7 +304,10 @@ export class Dapp extends React.Component {
   // don't need to poll it. If that's the case, you can just fetch it when you
   // initialize the app, as we do with the token data.
   _startPollingData() {
-    this._pollDataInterval = setInterval(() => this._updateBalance(), 10000);
+    this._pollDataInterval = setInterval(() => {
+      this._updateBalance()
+      this.checkWinLose()
+    }, 10000);
 
     // We run it once immediately so we don't have to wait for it
     this._updateBalance();
@@ -343,8 +371,8 @@ export class Dapp extends React.Component {
     });
     if(this.state.NFTs){
       this.state.NFTs.filter(function (nft) { 
-        if(nft.openseaLink == '' && nft.nftContractName == 'NFTSimple'){
-          const found = NFTs.some(e => e.tokenId == nft.tokenId);
+        if(nft.openseaLink==='' && nft.nftContractName==='NFTSimple'){
+          const found = NFTs.some(e => e.tokenId===nft.tokenId);
           if (!found) NFTs.unshift(nft)
         }
      })
@@ -423,25 +451,6 @@ export class Dapp extends React.Component {
       if (receipt.status === 0) {
         throw new Error("Transaction failed");
       }
-
-      // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_LOSE, this.neverFightTwice.address)
-      // await this.vrfCoordinatorMock.callBackWithRandomness(requestId, RANDOM_NUMBER_VRF_WIN, this.neverFightTwice.address)
-      // let randomNumber = await this.neverFightTwice.requestIdToRandomNumber(requestId)
-      // setTimeout(async function(){ 
-      //   let response = "You "
-      //   let isWin = await this.neverFightTwice.requestIdToWinOrLose(requestId)
-      //   response += isWin? 'Win!\n': 'Lose!\n'
-      //   let randomNumber = await this.neverFightTwice.getRandomNumberFromRequestId(requestId)
-      //   response += 'The random number was '+randomNumber.toNumber().toString()
-      //   if(isWin){
-      //     let winTokenId = await this.neverFightTwice.requestIdToWinTokenId(requestId)
-      //     let winNFTcontract = await this.neverFightTwice.requestIdToWinNFTcontract(requestId)
-      //     response += `\nThe tokenId you won: ${winTokenId}, NFT contract: ${winNFTcontract}`
-      //   }
-        
-      //   alert(response); 
-      // }, 10000); // 10 seconds
-      
 
       await this._updateBalance();
 

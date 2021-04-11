@@ -52,20 +52,25 @@ export function AddNFT({ NFTs, transferTokens }) {
     <div className="col-2" key={i}>
       <Card className={classes.root}>
       <CardActionArea>
-      {NFT.thumbnail && NFT.thumbnail.slice(-3) === 'mp4'?  
+      {NFT.thumbnail ? (NFT.thumbnail.slice(-3) === 'mp4'?  
         <CardMedia
           component='video'
           className={classes.media}
           image={NFT.thumbnail}
-          title="Contemplative Reptile"
+          title="NFT image"
           autoPlay
           loop
         />:
         <CardMedia
           className={classes.media}
           image={NFT.thumbnail}
-          title="Contemplative Reptile"
-        />}
+          title="NFT image"
+        />): 
+        (<CardMedia
+          className={classes.media}
+          image={"http://placekitten.com/200/200?image=" + (i+1).toString()}
+          title="NFT image"
+        />)}
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
           {NFT.nftContractName} 
