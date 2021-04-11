@@ -269,25 +269,25 @@ export class Dapp extends React.Component {
         
         let response = "You "
         let randomNumber, NFTcontract_win, NFTid_win, NFTcontract_original, NFTid_original, requestId
-        // console.log(winLog.length, loseLog.length)
+        console.log(winLog.length, loseLog.length)
         if(winLog.length != 0){
           // win
           response += "Win!\n"
           requestId = winLog[0].args[1]
-          randomNumber = winLog[0].args[2]
+          randomNumber = winLog[0].args[2].toString()
           NFTcontract_original = winLog[0].args[3]
-          NFTid_original = winLog[0].args[4]
+          NFTid_original = winLog[0].args[4].toNumber()
           NFTcontract_win = winLog[0].args[5]
-          NFTid_win = winLog[0].args[6]
-          console.log('Win', requestId, randomNumber, NFTcontract_original, NFTid_original, NFTcontract_win, NFTid_win.toNumber())
+          NFTid_win = winLog[0].args[6].toNumber()
+          console.log('Win', requestId, randomNumber, NFTcontract_original, NFTid_original, NFTcontract_win, NFTid_win)
         }
         if(loseLog.length != 0){
           // lose
           response += "Lose.\n"
           requestId = loseLog[0].args[1]
-          randomNumber = loseLog[0].args[2]
+          randomNumber = loseLog[0].args[2].toString()
           NFTcontract_original = loseLog[0].args[3]
-          NFTid_original = loseLog[0].args[4]
+          NFTid_original = loseLog[0].args[4].toNumber()
           console.log('Lose', requestId, randomNumber, NFTcontract_original, NFTid_original)
         }
 

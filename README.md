@@ -94,3 +94,5 @@ This project is modified from https://github.com/pappas999/chainlink-hardhat-box
 - Add waiting for the bet result screen & win or lose (Now console.log on Win Lose event)
 - Show random 3 of the user's NFTs and random 3 of N.F.T's NFTs. (may use [react paginate](https://www.npmjs.com/package/react-paginate))
 - A button to generate a random seed for the user
+- Find out why it's slow when entering random seed
+- NFT during bet should be stored in somewhere with some animation
