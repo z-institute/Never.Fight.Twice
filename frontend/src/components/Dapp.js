@@ -8,7 +8,7 @@ import { ethers } from "ethers";
 import NeverFightTwiceArt from "../contracts/NeverFightTwice.json";
 import NFTSimpleArt from "../contracts/NFTSimple.json";
 import ERC721Art from "../contracts/ERC721.json";
-// import contractAddress from "../contracts/contract-address.json";
+import contractAddress from "../contracts/contract-address.json";
 
 // All the logic of this dapp is contained in the Dapp component.
 // These other components are just presentational ones: they don't have any
