@@ -14,14 +14,40 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Tooltip from '@material-ui/core/Tooltip';
+import Carousel from 'react-multi-carousel';
+import 'react-multi-carousel/lib/styles.css';
+import Grid from '@material-ui/core/Grid';
+
+const responsive = {
+  superLargeDesktop: {
+    // the naming can be any, depends on you.
+    breakpoint: { max: 4000, min: 3000 },
+    items: 5
+  },
+  desktop: {
+    breakpoint: { max: 3000, min: 1024 },
+    items: 3
+  },
+  tablet: {
+    breakpoint: { max: 1024, min: 464 },
+    items: 2
+  },
+  mobile: {
+    breakpoint: { max: 464, min: 0 },
+    items: 1
+  }
+};
 
 const useStyles = makeStyles({
-  root: {
-    maxWidth: 345,
-    justifyContent: 'center'
+  root: { // card
+    maxWidth: 200,
+    justifyContent: 'center',
+    flexGrow: 1,
+    width: 160
   },
   media: {
-    height: 140,
+    height: 160,
   }
 });
 
@@ -46,49 +72,51 @@ export function AddNFT({ NFTs, transferTokens }) {
     handleClose();
   };
 
-  return <div className="row justify-content-md-center">{
+  return <Grid container spacing={3}>
+  <Grid item xs={6}>
+    <Carousel responsive={responsive}>{
     NFTs.map((NFT, i) => {     
     return (
     <div className="col-2" key={i}>
       <Card className={classes.root}>
       <CardActionArea>
+      <Tooltip title={"TokenId: "+NFT.tokenId.toString()}>
       {NFT.thumbnail ? (NFT.thumbnail.slice(-3) === 'mp4'?  
         <CardMedia
           component='video'
           className={classes.media}
           image={NFT.thumbnail}
-          title="NFT image"
           autoPlay
           loop
         />:
         <CardMedia
           className={classes.media}
           image={NFT.thumbnail}
-          title="NFT image"
         />): 
         (<CardMedia
           className={classes.media}
           image={"http://placekitten.com/200/200?image=" + (i%16+1).toString()}
-          title="NFT image"
         />)}
+        </Tooltip>
+
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
           {NFT.nftContractName} 
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
-          {NFT.name} (tokenId: {NFT.tokenId})
+          {NFT.name}
           </Typography>
+          
         </CardContent>
-      </CardActionArea>
-      <CardActions>
+        <CardActions classes={{root: classes.root}}>
         <Button size="small" color="primary" target="_blank" href={NFT.openseaLink}>
           View on Opensea
         </Button>
-      </CardActions>
+        </CardActions>
+      </CardActionArea>
     </Card>
-    <Box m={2}>
-    <div className="row justify-content-center" >  
-    <Button variant="contained" color="primary" onClick={handleClickOpen}>
+    <Box p={2}>
+    <Button variant="contained" color="primary" onClick={handleClickOpen} >
       Bet!
       </Button>
       <form onSubmit={handleSubmit}>
@@ -117,8 +145,7 @@ export function AddNFT({ NFTs, transferTokens }) {
         </DialogActions>
       </Dialog>
       </form>
-    </div>
     </Box>
     </div>)})}
-    </div>
+    </Carousel></Grid></Grid>
 }

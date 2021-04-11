@@ -152,12 +152,14 @@ export class Dapp extends React.Component {
 
         <div className="row">
           <div className="col-12">
+
               <AddNFT
                 NFTs={this.state.NFTs}
                 transferTokens={(nftContractAddr, tokenId, seed) =>
                   this._transferTokens(nftContractAddr, tokenId, seed)
                 }
               />
+             
 
             {/*
               This component displays a form that the user can use to send a 
@@ -245,6 +247,7 @@ export class Dapp extends React.Component {
    
     this.setState({
       selectedAddress: userAddress,
+      requestIdUsed: []
     });
 
     this._intializeEthers();
@@ -261,6 +264,11 @@ export class Dapp extends React.Component {
     this.neverFightTwice = new ethers.Contract(NeverFightTwiceAddr,NeverFightTwiceArt.abi,this._provider.getSigner(0));
     this.nftSimple = new ethers.Contract(NFTSimpleAddr,NFTSimpleArt.abi,this._provider.getSigner(0));
   }
+  handleChangeRequestIdUsed(index) {
+    this.setState(prev => ({
+      requestIdUsed: prev.requestIdUsed.map((val, i) => !val && i === index ? true : val)
+    }))
+}
     async checkWinLose(){
         let logs = await this._provider.getLogs({address: this.neverFightTwice.address})
         let winLog = this.parseLogs(this.neverFightTwice, "Win", logs)
@@ -269,26 +277,34 @@ export class Dapp extends React.Component {
         
         let response = "You "
         let randomNumber, NFTcontract_win, NFTid_win, NFTcontract_original, NFTid_original, requestId
-        console.log(winLog.length, loseLog.length)
+        // console.log(winLog.length, loseLog.length)
         if(winLog.length != 0){
           // win
-          response += "Win!\n"
           requestId = winLog[0].args[1]
-          randomNumber = winLog[0].args[2].toString()
-          NFTcontract_original = winLog[0].args[3]
-          NFTid_original = winLog[0].args[4].toNumber()
-          NFTcontract_win = winLog[0].args[5]
-          NFTid_win = winLog[0].args[6].toNumber()
-          console.log('Win', requestId, randomNumber, NFTcontract_original, NFTid_original, NFTcontract_win, NFTid_win)
-        }
+          console.log(parseInt(requestId), this.state.requestIdUsed[parseInt(requestId)])
+          if(!this.state.requestIdUsed[parseInt(requestId)]){
+            this.handleChangeRequestIdUsed(parseInt(requestId))
+            response += "Win!\n"
+            randomNumber = winLog[0].args[2].toString()
+            NFTcontract_original = winLog[0].args[3]
+            NFTid_original = winLog[0].args[4].toNumber()
+            NFTcontract_win = winLog[0].args[5]
+            NFTid_win = winLog[0].args[6].toNumber()
+            console.log('Win', requestId, randomNumber, NFTcontract_original, NFTid_original, NFTcontract_win, NFTid_win)
+              }        
+            }
         if(loseLog.length != 0){
           // lose
-          response += "Lose.\n"
+          console.log(parseInt(requestId), this.state.requestIdUsed[parseInt(requestId)])
           requestId = loseLog[0].args[1]
-          randomNumber = loseLog[0].args[2].toString()
-          NFTcontract_original = loseLog[0].args[3]
-          NFTid_original = loseLog[0].args[4].toNumber()
-          console.log('Lose', requestId, randomNumber, NFTcontract_original, NFTid_original)
+          if(!this.state.requestIdUsed[parseInt(requestId)]){
+            this.handleChangeRequestIdUsed(parseInt(requestId))
+            response += "Lose.\n"
+            randomNumber = loseLog[0].args[2].toString()
+            NFTcontract_original = loseLog[0].args[3]
+            NFTid_original = loseLog[0].args[4].toNumber()
+            console.log('Lose', requestId, randomNumber, NFTcontract_original, NFTid_original)
+          }
         }
 
         // let isWin = await this.neverFightTwice.requestIdToWinOrLose(requestId)
@@ -315,7 +331,7 @@ export class Dapp extends React.Component {
     this._pollDataInterval = setInterval(() => {
       this._updateBalance()
       this.checkWinLose()
-    }, 1000);
+    }, 5000); // check every 5 seconds
 
     // We run it once immediately so we don't have to wait for it
     this._updateBalance();
