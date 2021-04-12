@@ -102,3 +102,4 @@ This project is modified from https://github.com/pappas999/chainlink-hardhat-box
 - A button to generate a random seed for the user
 - Find out why it's slow when entering random seed
 - NFT during bet should be stored in somewhere with some animation
+- Add NFT after win

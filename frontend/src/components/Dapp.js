@@ -16,7 +16,8 @@ import contractAddress from "../contracts/contract-address.json";
 import { NoWalletDetected } from "./NoWalletDetected";
 import { ConnectWallet } from "./ConnectWallet";
 import { Loading } from "./Loading";
-import { Mint} from "./Mint"
+import { Mint} from "./Mint";
+import { Popup } from "./Popup";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { AddNFT } from "./AddNFT";
@@ -94,6 +95,14 @@ export class Dapp extends React.Component {
       <div className="container p-4">
         <div className="row">
           <div className="col-12">
+            <Popup
+              // _open={true}
+              // _title={'🎉 Congratulations! You Win!!! 🎊🥳'}
+              // _content={'The random number was randomNumber}. The NFT you betted was from contract ${NFTcontract_original} with token ID ${NFTid_original}.The NFT you won was from contract NFTcontract_win} with token ID ${NFTid_win}.'}
+              _open={this.state._popup}
+              _title={this.state._title}
+              _content={this.state._content}
+            />
             <h1>
               {/* {this.state.tokenData.name} ({this.state.tokenData.symbol}) */}
               Never Fight Twice!
@@ -259,6 +268,11 @@ export class Dapp extends React.Component {
       requestIdUsed: prev.requestIdUsed.map((val, i) => !val && i === index ? true : val)
     }))
 }
+
+  openPopup(_title, _content){
+    this.setState({_title: _title, _content: _content, _popup: true})
+    console.log('open popup')
+  }
     async checkWinLose(){
         let logs = await this._provider.getLogs({address: this.neverFightTwice.address})
         let winLog = this.parseLogs(this.neverFightTwice, "Win", logs)
@@ -283,7 +297,15 @@ export class Dapp extends React.Component {
             NFTcontract_win = winLog[0].args[5]
             NFTid_win = winLog[0].args[6].toString()
             console.log('Win', requestId, randomNumber, NFTcontract_original, NFTid_original, NFTcontract_win, NFTid_win)
-            alert(response)
+
+            
+            let _title = '🎉 Congratulations! You Win!!! 🎊🥳'
+            let _content = `The random number was ${randomNumber}. The NFT you betted was from contract ${NFTcontract_original} with token ID ${NFTid_original}.\n
+            The NFT you won was from contract ${NFTcontract_win} with token ID ${NFTid_win}.`
+            this.openPopup(_title, _content)
+            // alert(response)
+            // TODO: add win dialog
+            
 
             
               }        
@@ -291,6 +313,7 @@ export class Dapp extends React.Component {
             }
         if(loseLog.length != 0){
           // lose
+
           requestId = loseLog[0].args[1]
           let idInt = parseInt(requestId.substring(0,10))
           if(!this.state.requestIdUsed[idInt]){
@@ -302,7 +325,10 @@ export class Dapp extends React.Component {
             NFTcontract_original = loseLog[0].args[3]
             NFTid_original = loseLog[0].args[4].toString()
             console.log('Lose', requestId, randomNumber, NFTcontract_original, NFTid_original)
-            alert(response)
+            let _title = '🥺 Oh No... You Lose... 😭😨'
+            let _content = `The random number was ${randomNumber}. The NFT you betted was from contract ${NFTcontract_original} with token ID ${NFTid_original}.`
+            this.openPopup(_title, _content)
+            // alert(response)
           }
         }
 
@@ -330,7 +356,7 @@ export class Dapp extends React.Component {
     this._pollDataInterval = setInterval(() => {
       this._updateBalance()
       this.checkWinLose()
-    }, 7000); // check every 7 seconds
+    }, 8000); // check every 8 seconds
 
     // We run it once immediately so we don't have to wait for it
     this._updateBalance();
@@ -374,7 +400,7 @@ export class Dapp extends React.Component {
     let response = await fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${this.state.selectedAddress}&order_direction=desc&offset=0&limit=20`, options);
     let commits = await response.json();
 
-    let len = commits.assets.length
+    let len = commits.assets? commits.assets.length: 0
     let NFTs = []
 
     for (let i=0;i<len;i++ ){
@@ -396,14 +422,15 @@ export class Dapp extends React.Component {
       if(this.state.NFTs){
         this.state.NFTs.filter(async function (nft) { 
           if(nft.openseaLink==='' && nft.nftContractName==='NFTSimple'){
-            let owner = await token.ownerOf(nft.tokenId)
-            console.log(owner,selectedAddress )
-            const token = new ethers.Contract(nft.nftContractAddr, ERC721Art.abi, signer);
-            if(owner.toLowerCase() == selectedAddress){
+            // let owner = await token.ownerOf(nft.tokenId)
+            // console.log(owner,selectedAddress )
+            // const token = new ethers.Contract(nft.nftContractAddr, ERC721Art.abi, signer);
+            // if(owner.toLowerCase() == selectedAddress){
                 const found = NFTs.some(e => e.tokenId===nft.tokenId);
                 if (!found) NFTs.unshift(nft)
             
-            }  }
+            // }  
+          }
           // if(nft.nftContractAddr === this.state.toRemoveNFT && nft.tokenId === this.state.toRemoveId){
           //   NFTs = this.removeA(NFTs, nft)
           // }
@@ -421,7 +448,7 @@ export class Dapp extends React.Component {
     ////////////
     let response = await fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${this.neverFightTwice.address}&order_direction=desc&offset=0&limit=20`, options);
     let commits = await response.json();
-    let len = commits.assets.length
+    let len = commits.assets? commits.assets.length: 0
     let NFTs_NeverFightTwice = []
     for (let i=0;i<len;i++ ){
       let item = commits.assets[i] 
