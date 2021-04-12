@@ -98,7 +98,14 @@ export class Dapp extends React.Component {
             <Popup
               // _open={true}
               // _title={'🎉 Congratulations! You Win!!! 🎊🥳'}
-              // _content={'The random number was randomNumber}. The NFT you betted was from contract ${NFTcontract_original} with token ID ${NFTid_original}.The NFT you won was from contract NFTcontract_win} with token ID ${NFTid_win}.'}
+              // _content={{
+              //   requestId: '98765894308076546',
+              //   randomNumber: '0987654356789087654',
+              //   NFTcontract_original: '0x09876547890',
+              //   NFTid_original: '9876543234567890876',
+              //   // NFTcontract_win: 'NFTcontract_win',
+              //   // NFTid_win: 'NFTid_win'
+              // }}
               _open={this.state._popup}
               _title={this.state._title}
               _content={this.state._content}
@@ -249,7 +256,7 @@ export class Dapp extends React.Component {
       .then(response => response.json())
       .then(response => {
     const { memes } = response.data
-    this.setState({ allMemeImgs: memes })
+    this.setState({ allMemeImgs: memes, _popup: false })
     // console.log(memes)
     })
 
@@ -300,8 +307,14 @@ export class Dapp extends React.Component {
 
             
             let _title = '🎉 Congratulations! You Win!!! 🎊🥳'
-            let _content = `The random number was ${randomNumber}. The NFT you betted was from contract ${NFTcontract_original} with token ID ${NFTid_original}.\n
-            The NFT you won was from contract ${NFTcontract_win} with token ID ${NFTid_win}.`
+            let _content = {
+              requestId: requestId,
+              randomNumber: randomNumber,
+              NFTid_original: NFTid_original,
+              NFTcontract_original: NFTcontract_original,
+              NFTcontract_win: NFTcontract_win,
+              NFTid_win: NFTid_win
+            }
             this.openPopup(_title, _content)
             alert(response)
             // TODO: add win dialog
@@ -326,7 +339,12 @@ export class Dapp extends React.Component {
             NFTid_original = loseLog[0].args[4].toString()
             console.log('Lose', requestId, randomNumber, NFTcontract_original, NFTid_original)
             let _title = '🥺 Oh No... You Lose... 😭😨'
-            let _content = `The random number was ${randomNumber}. The NFT you betted was from contract ${NFTcontract_original} with token ID ${NFTid_original}.`
+            let _content = {
+              requestId: requestId,
+              randomNumber: randomNumber,
+              NFTcontract_original: NFTcontract_original,
+              NFTid_original: NFTid_original
+            }
             this.openPopup(_title, _content)
             alert(response)
           }
