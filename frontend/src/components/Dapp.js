@@ -87,7 +87,7 @@ export class Dapp extends React.Component {
 
     // If the token data or the user's balance hasn't loaded yet, we show
     // a loading component.
-    if (!this.state.tokenData || !this.state.balance || !this.state.tokenIds || !this.state.NFTs) {
+    if (!this.state.tokenData || !this.state.balance || !this.state.tokenIds || !this.state.NFTs || !this.state.NFTs_NeverFightTwice) {
       return <Loading />;
     }
 
@@ -270,8 +270,11 @@ export class Dapp extends React.Component {
         if(winLog.length != 0){
           // win
           requestId = winLog[0].args[1]
-          if(!this.state.requestIdUsed[parseInt(requestId.substring(0,10))]){
-            this.handleChangeRequestIdUsed(parseInt(requestId.substring(0,10)))
+          let idInt = parseInt(requestId.substring(0,10))
+          if(!this.state.requestIdUsed[idInt]){
+            let _requestIdUsed = this.state.requestIdUsed
+            _requestIdUsed[idInt]=true;
+            this.setState({requestIdUsed: _requestIdUsed})
             response += "Win!\n"
             randomNumber = winLog[0].args[2].toString()
             NFTcontract_original = winLog[0].args[3]
@@ -288,8 +291,11 @@ export class Dapp extends React.Component {
         if(loseLog.length != 0){
           // lose
           requestId = loseLog[0].args[1]
-          if(!this.state.requestIdUsed[parseInt(requestId.substring(0,10))]){
-            this.handleChangeRequestIdUsed(parseInt(requestId.substring(0,10)))
+          let idInt = parseInt(requestId.substring(0,10))
+          if(!this.state.requestIdUsed[idInt]){
+            let _requestIdUsed = this.state.requestIdUsed
+            _requestIdUsed[idInt]=true;
+            this.setState({requestIdUsed: _requestIdUsed})
             response += "Lose.\n"
             randomNumber = loseLog[0].args[2].toString()
             NFTcontract_original = loseLog[0].args[3]
@@ -323,7 +329,7 @@ export class Dapp extends React.Component {
     this._pollDataInterval = setInterval(() => {
       this._updateBalance()
       this.checkWinLose()
-    }, 5000); // check every 5 seconds
+    }, 7000); // check every 7 seconds
 
     // We run it once immediately so we don't have to wait for it
     this._updateBalance();
@@ -369,6 +375,7 @@ export class Dapp extends React.Component {
 
     let len = commits.assets.length
     let NFTs = []
+
     for (let i=0;i<len;i++ ){
       let item = commits.assets[i] 
       const token = new ethers.Contract(item.asset_contract.address, ERC721Art.abi, signer);
@@ -383,34 +390,43 @@ export class Dapp extends React.Component {
         tokenId: item.token_id
       })
     }
+
+    if(i==len-1){ // finish 
+      if(this.state.NFTs){
+        this.state.NFTs.filter(async function (nft) { 
+          if(nft.openseaLink==='' && nft.nftContractName==='NFTSimple'){
+            let owner = await token.ownerOf(nft.tokenId)
+            const token = new ethers.Contract(nft.nftContractAddr, ERC721Art.abi, signer);
+            if(owner.toLowerCase() == selectedAddress){
+                const found = NFTs.some(e => e.tokenId===nft.tokenId);
+                if (!found) NFTs.unshift(nft)
+            
+            }  }
+          // if(nft.nftContractAddr === this.state.toRemoveNFT && nft.tokenId === this.state.toRemoveId){
+          //   NFTs = this.removeA(NFTs, nft)
+          // }
+       })
+  
+      }
     }
-    if(this.state.NFTs){
-      this.state.NFTs.filter(function (nft) { 
-        if(nft.openseaLink==='' && nft.nftContractName==='NFTSimple'){
-          const found = NFTs.some(e => e.tokenId===nft.tokenId);
-          if (!found) NFTs.unshift(nft)
-        }
-        // if(nft.nftContractAddr === this.state.toRemoveNFT && nft.tokenId === this.state.toRemoveId){
-        //   NFTs = this.removeA(NFTs, nft)
-        // }
-     })
-
     }
-
-
-
+    
+    console.log('updated NFTs')
+    return NFTs
+  }
+  async _updateNeverFightTwiceNFTs(){
 
     ////////////
-    response = await fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${this.neverFightTwice.address}&order_direction=desc&offset=0&limit=20`, options);
-    commits = await response.json();
-    len = commits.assets.length
+    let response = await fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${this.neverFightTwice.address}&order_direction=desc&offset=0&limit=20`, options);
+    let commits = await response.json();
+    let len = commits.assets.length
     let NFTs_NeverFightTwice = []
     for (let i=0;i<len;i++ ){
       let item = commits.assets[i] 
-      const token = new ethers.Contract(item.asset_contract.address, ERC721Art.abi, signer);
-      let owner = await token.ownerOf(item.token_id)
-      if(owner.toLowerCase() == neverFightTwiceAddr){
-      NFTs.push({
+      // const token = new ethers.Contract(item.asset_contract.address, ERC721Art.abi, signer);
+      // let owner = await token.ownerOf(item.token_id)
+      // if(owner.toLowerCase() == neverFightTwiceAddr){
+        NFTs_NeverFightTwice.push({
         name: item.name,
         nftContractName: item.asset_contract.name,
         nftContractAddr: item.asset_contract.address,
@@ -418,11 +434,11 @@ export class Dapp extends React.Component {
         openseaLink: item.permalink,
         tokenId: item.token_id
       })
-    }
+    // }
     }
 
-    this.setState({ NFTs: NFTs, NFTs_NeverFightTwice: NFTs_NeverFightTwice});
-    console.log('updated NFTs')
+    console.log('updated NeverFightTwice NFTs')
+    this.setState({NFTs_NeverFightTwice: NFTs_NeverFightTwice});
   }
 
   // change to update all of your NFT balance
@@ -433,7 +449,9 @@ export class Dapp extends React.Component {
       account: this.state.selectedAddress
     })
     
-    this._updateNFTs();
+    this._updateNFTs().then(NFTs => this.setState({ NFTs: NFTs}))
+    this._updateNeverFightTwiceNFTs();
+
     
     // console.log(NFTs.length, commits.assets.length)
     this.setState({ balance: balance, tokenIds: tokenIds});
