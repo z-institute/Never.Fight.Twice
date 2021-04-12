@@ -303,7 +303,7 @@ export class Dapp extends React.Component {
             let _content = `The random number was ${randomNumber}. The NFT you betted was from contract ${NFTcontract_original} with token ID ${NFTid_original}.\n
             The NFT you won was from contract ${NFTcontract_win} with token ID ${NFTid_win}.`
             this.openPopup(_title, _content)
-            // alert(response)
+            alert(response)
             // TODO: add win dialog
             
 
@@ -328,7 +328,7 @@ export class Dapp extends React.Component {
             let _title = '🥺 Oh No... You Lose... 😭😨'
             let _content = `The random number was ${randomNumber}. The NFT you betted was from contract ${NFTcontract_original} with token ID ${NFTid_original}.`
             this.openPopup(_title, _content)
-            // alert(response)
+            alert(response)
           }
         }
 
