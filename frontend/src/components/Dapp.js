@@ -208,7 +208,7 @@ export class Dapp extends React.Component {
   }
 
   parseLogs(contract, eventName, logs) {
-    let event = contract.interface.getEvent(eventName)
+    // let event = contract.interface.getEvent(eventName)
     let topic = contract.interface.getEventTopic(eventName)
 
     return logs.filter(log => log.topics[0]===topic && contract.address===log.address)
@@ -289,7 +289,7 @@ export class Dapp extends React.Component {
         let response = "You "
         let randomNumber, NFTcontract_win, NFTid_win, NFTcontract_original, NFTid_original, requestId
         // console.log(winLog.length, loseLog.length)
-        if(winLog.length != 0){
+        if(winLog.length !== 0){
           // win
           requestId = winLog[0].args[1]
           let idInt = parseInt(requestId.substring(0,10))
@@ -324,7 +324,7 @@ export class Dapp extends React.Component {
               }        
 
             }
-        if(loseLog.length != 0){
+        if(loseLog.length !== 0){
           // lose
 
           requestId = loseLog[0].args[1]
@@ -412,7 +412,7 @@ export class Dapp extends React.Component {
   async _updateNFTs(){
     const signer = this._provider.getSigner(0);
     const selectedAddress = this.state.selectedAddress;
-    const neverFightTwiceAddr = this.neverFightTwice.address
+    // const neverFightTwiceAddr = this.neverFightTwice.address
     // get all NFTs
     // let response = await fetch(`https://api.opensea.io/api/v1/assets?owner=${this.state.selectedAddress}&order_direction=desc&offset=0&limit=20`, options);
     let response = await fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${this.state.selectedAddress}&order_direction=desc&offset=0&limit=20`, options);
@@ -425,7 +425,7 @@ export class Dapp extends React.Component {
       let item = commits.assets[i] 
       const token = new ethers.Contract(item.asset_contract.address, ERC721Art.abi, signer);
       let owner = await token.ownerOf(item.token_id)
-      if(owner.toLowerCase() == selectedAddress){
+      if(owner.toLowerCase() === selectedAddress){
       NFTs.push({
         name: item.name,
         nftContractName: item.asset_contract.name,
@@ -436,7 +436,7 @@ export class Dapp extends React.Component {
       })
     }
 
-    if(i==len-1){ // finish 
+    if(i===len-1){ // finish 
       if(this.state.NFTs){
         this.state.NFTs.filter(async function (nft) { 
           if(nft.openseaLink==='' && nft.nftContractName==='NFTSimple'){
