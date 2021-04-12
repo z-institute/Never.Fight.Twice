@@ -17,10 +17,8 @@ import { NoWalletDetected } from "./NoWalletDetected";
 import { ConnectWallet } from "./ConnectWallet";
 import { Loading } from "./Loading";
 import { Mint} from "./Mint"
-import { Transfer } from "./Transfer";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
-import { NoTokensMessage } from "./NoTokensMessage";
 import { AddNFT } from "./AddNFT";
 const HARDHAT_NETWORK_ID = '1337';
 const NeverFightTwiceAddr = contractAddress.NeverFightTwice;
@@ -116,10 +114,13 @@ export class Dapp extends React.Component {
             <span>
               You have{" "}<b>
                 {this.state.NFTs.length.toString()}
-              </b>{" "} {this.state.NFTs.length === 20? "or more ": ''} NFTs.The <a href={"https://rinkeby.etherscan.io/address/"+this.neverFightTwice.address}>NeverFightTwice contract</a> has a total of{" "}
+              </b>{" "} {this.state.NFTs.length === 20? "or more ": ''} NFTs. The <a href={"https://rinkeby.etherscan.io/address/"+this.neverFightTwice.address}>NeverFightTwice contract</a> has a total of{" "}
               <b>
                 {this.state.NFTs_NeverFightTwice.length.toString()}
-              </b>{" "}NFTs. All previously lost NFTs are locked here. Bet now to win them all!
+              </b>{" "}NFTs. All previously lost NFTs are locked here. Bet now to win them all! 
+              <span style={{color: 'gray', fontSize: 11.5}}>{" * "}NFTs here are fetched from Opensea, so it may be a bit slow to update the latest balances.</span>
+              <br/>
+              {this.state.latestBetTx && <div>Your Latest Bet Transaction: <a href={"https://rinkeby.etherscan.io/tx/"+this.state.latestBetTx}>{this.state.latestBetTx}</a></div>}
 
             </span>
           </div>
@@ -396,6 +397,7 @@ export class Dapp extends React.Component {
         this.state.NFTs.filter(async function (nft) { 
           if(nft.openseaLink==='' && nft.nftContractName==='NFTSimple'){
             let owner = await token.ownerOf(nft.tokenId)
+            console.log(owner,selectedAddress )
             const token = new ethers.Contract(nft.nftContractAddr, ERC721Art.abi, signer);
             if(owner.toLowerCase() == selectedAddress){
                 const found = NFTs.some(e => e.tokenId===nft.tokenId);
@@ -520,7 +522,7 @@ export class Dapp extends React.Component {
       let tx = await nftContract['safeTransferFrom(address,address,uint256,bytes)'](this.state.selectedAddress.toString(), this.neverFightTwice.address.toString(), _tokenId, [...Buffer.from(_seed)]);
       // let tx = await nftContract.safeTransferFrom(this.state.selectedAddress, this.neverFightTwice.address, parseInt(_tokenId), [...Buffer.from(_seed)])
       console.log("transaction sent")
-      this.setState({ txBeingSent: tx.hash, toRemoveNFT: _nftContractAddr, toRemoveId: _tokenId  });
+      this.setState({ txBeingSent: tx.hash, toRemoveNFT: _nftContractAddr, toRemoveId: _tokenId, latestBetTx: tx.hash  });
       let receipt = await tx.wait()
       // let requestId = receipt.events[5].data.substring(0,66)
       
