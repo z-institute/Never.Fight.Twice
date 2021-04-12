@@ -440,7 +440,7 @@ export class Dapp extends React.Component {
     }
 
     console.log('updated NeverFightTwice NFTs')
-    this.setState({NFTs_NeverFightTwice: NFTs_NeverFightTwice});
+    return NFTs_NeverFightTwice;
   }
 
   // change to update all of your NFT balance
@@ -452,9 +452,8 @@ export class Dapp extends React.Component {
     })
     
     this._updateNFTs().then(NFTs => this.setState({ NFTs: NFTs}))
-    this._updateNeverFightTwiceNFTs();
+    this._updateNeverFightTwiceNFTs().then(NFTs_NeverFightTwice => this.setState({NFTs_NeverFightTwice: NFTs_NeverFightTwice}));
 
-    
     // console.log(NFTs.length, commits.assets.length)
     this.setState({ balance: balance, tokenIds: tokenIds});
     console.log('updated balance')
