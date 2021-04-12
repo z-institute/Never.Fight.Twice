@@ -270,29 +270,32 @@ export class Dapp extends React.Component {
         if(winLog.length != 0){
           // win
           requestId = winLog[0].args[1]
-          console.log(parseInt(requestId), this.state.requestIdUsed[parseInt(requestId)])
-          if(!this.state.requestIdUsed[parseInt(requestId)]){
-            this.handleChangeRequestIdUsed(parseInt(requestId))
+          if(!this.state.requestIdUsed[parseInt(requestId.substring(0,10))]){
+            this.handleChangeRequestIdUsed(parseInt(requestId.substring(0,10)))
             response += "Win!\n"
             randomNumber = winLog[0].args[2].toString()
             NFTcontract_original = winLog[0].args[3]
-            NFTid_original = winLog[0].args[4].toNumber()
+            NFTid_original = winLog[0].args[4].toString()
             NFTcontract_win = winLog[0].args[5]
-            NFTid_win = winLog[0].args[6].toNumber()
+            NFTid_win = winLog[0].args[6].toString()
             console.log('Win', requestId, randomNumber, NFTcontract_original, NFTid_original, NFTcontract_win, NFTid_win)
+            alert(response)
+
+            
               }        
+
             }
         if(loseLog.length != 0){
           // lose
-          console.log(parseInt(requestId), this.state.requestIdUsed[parseInt(requestId)])
           requestId = loseLog[0].args[1]
-          if(!this.state.requestIdUsed[parseInt(requestId)]){
-            this.handleChangeRequestIdUsed(parseInt(requestId))
+          if(!this.state.requestIdUsed[parseInt(requestId.substring(0,10))]){
+            this.handleChangeRequestIdUsed(parseInt(requestId.substring(0,10)))
             response += "Lose.\n"
             randomNumber = loseLog[0].args[2].toString()
             NFTcontract_original = loseLog[0].args[3]
-            NFTid_original = loseLog[0].args[4].toNumber()
+            NFTid_original = loseLog[0].args[4].toString()
             console.log('Lose', requestId, randomNumber, NFTcontract_original, NFTid_original)
+            alert(response)
           }
         }
 
@@ -354,20 +357,23 @@ export class Dapp extends React.Component {
     return h;
   };
 
-  // TODO: change to update all of your NFT balance
-  async _updateBalance() {
-    const balance = await this.nftSimple.balanceOf(this.state.selectedAddress);
-    let tokenIds = await this.listTokensOfOwner({
-      token: this.nftSimple.address, 
-      account: this.state.selectedAddress
-    })
+
+  async _updateNFTs(){
+    const signer = this._provider.getSigner(0);
+    const selectedAddress = this.state.selectedAddress;
+    const neverFightTwiceAddr = this.neverFightTwice.address
     // get all NFTs
     // let response = await fetch(`https://api.opensea.io/api/v1/assets?owner=${this.state.selectedAddress}&order_direction=desc&offset=0&limit=20`, options);
     let response = await fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${this.state.selectedAddress}&order_direction=desc&offset=0&limit=20`, options);
     let commits = await response.json();
-    // console.log(commits.assets)
+
+    let len = commits.assets.length
     let NFTs = []
-    commits.assets.forEach(function (item, index) {
+    for (let i=0;i<len;i++ ){
+      let item = commits.assets[i] 
+      const token = new ethers.Contract(item.asset_contract.address, ERC721Art.abi, signer);
+      let owner = await token.ownerOf(item.token_id)
+      if(owner.toLowerCase() == selectedAddress){
       NFTs.push({
         name: item.name,
         nftContractName: item.asset_contract.name,
@@ -376,25 +382,35 @@ export class Dapp extends React.Component {
         openseaLink: item.permalink,
         tokenId: item.token_id
       })
-    });
+    }
+    }
     if(this.state.NFTs){
       this.state.NFTs.filter(function (nft) { 
         if(nft.openseaLink==='' && nft.nftContractName==='NFTSimple'){
           const found = NFTs.some(e => e.tokenId===nft.tokenId);
           if (!found) NFTs.unshift(nft)
         }
+        // if(nft.nftContractAddr === this.state.toRemoveNFT && nft.tokenId === this.state.toRemoveId){
+        //   NFTs = this.removeA(NFTs, nft)
+        // }
      })
+
     }
+
 
 
 
     ////////////
     response = await fetch(`https://testnets-api.opensea.io/api/v1/assets?owner=${this.neverFightTwice.address}&order_direction=desc&offset=0&limit=20`, options);
     commits = await response.json();
-    // console.log(commits.assets)
+    len = commits.assets.length
     let NFTs_NeverFightTwice = []
-    commits.assets.forEach(function (item, index) {
-      NFTs_NeverFightTwice.push({
+    for (let i=0;i<len;i++ ){
+      let item = commits.assets[i] 
+      const token = new ethers.Contract(item.asset_contract.address, ERC721Art.abi, signer);
+      let owner = await token.ownerOf(item.token_id)
+      if(owner.toLowerCase() == neverFightTwiceAddr){
+      NFTs.push({
         name: item.name,
         nftContractName: item.asset_contract.name,
         nftContractAddr: item.asset_contract.address,
@@ -402,12 +418,37 @@ export class Dapp extends React.Component {
         openseaLink: item.permalink,
         tokenId: item.token_id
       })
-    });
+    }
+    }
+
+    this.setState({ NFTs: NFTs, NFTs_NeverFightTwice: NFTs_NeverFightTwice});
+    console.log('updated NFTs')
+  }
+
+  // change to update all of your NFT balance
+  async _updateBalance() {
+    const balance = await this.nftSimple.balanceOf(this.state.selectedAddress);
+    let tokenIds = await this.listTokensOfOwner({
+      token: this.nftSimple.address, 
+      account: this.state.selectedAddress
+    })
+    
+    this._updateNFTs();
     
     // console.log(NFTs.length, commits.assets.length)
-    this.setState({ balance: balance, tokenIds: tokenIds, NFTs: NFTs, NFTs_NeverFightTwice: NFTs_NeverFightTwice});
+    this.setState({ balance: balance, tokenIds: tokenIds});
     console.log('updated balance')
   }
+  removeA(arr) {
+    var what, a = arguments, L = a.length, ax;
+    while (L > 1 && arr.length) {
+        what = a[--L];
+        while ((ax= arr.indexOf(what)) !== -1) {
+            arr.splice(ax, 1);
+        }
+    }
+    return arr;
+}
 
   async listTokensOfOwner({ token: tokenAddress, account }) {
     const token = new ethers.Contract(tokenAddress, ERC721Art.abi, this._provider.getSigner(0));
@@ -461,7 +502,7 @@ export class Dapp extends React.Component {
       let tx = await nftContract['safeTransferFrom(address,address,uint256,bytes)'](this.state.selectedAddress.toString(), this.neverFightTwice.address.toString(), _tokenId, [...Buffer.from(_seed)]);
       // let tx = await nftContract.safeTransferFrom(this.state.selectedAddress, this.neverFightTwice.address, parseInt(_tokenId), [...Buffer.from(_seed)])
       console.log("transaction sent")
-      this.setState({ txBeingSent: tx.hash });
+      this.setState({ txBeingSent: tx.hash, toRemoveNFT: _nftContractAddr, toRemoveId: _tokenId  });
       let receipt = await tx.wait()
       // let requestId = receipt.events[5].data.substring(0,66)
       
