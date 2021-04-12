@@ -59,7 +59,7 @@ export function Popup({_open, _title, _content}) {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-              {_content.NFTcontract_win? 
+              {_content && (_content.NFTcontract_win? 
                 <div>
                   {`The random number was`} <b data-tip={_content.randomNumber}>{_content.randomNumber.substring(0,6) + '...'}</b> {`. The NFT you betted was from contract ${_content.NFTcontract_original} with token ID`} <b data-tip={_content.NFTid_original}>{_content.NFTid_original.substring(0,6) + '...'}</b> {`.`}
             {`\nThe NFT you won was from contract ${_content.NFTcontract_win} with token ID `} <b data-tip={_content.NFTid_win}>{_content.NFTid_win.substring(0,6) + '...'}</b> {`.`}
@@ -69,7 +69,7 @@ export function Popup({_open, _title, _content}) {
                 <div>
                     {`The random number was`} <b data-tip={_content.randomNumber}>{_content.randomNumber.substring(0,6) + '...'}</b> {`. The NFT you betted was from contract ${_content.NFTcontract_original} with token ID`} <b data-tip={_content.NFTid_original}>{_content.NFTid_original.substring(0,6) + '...'}</b> {`.`}
             {"\n(hover to view the full values)"}
-                </div>
+                </div>)
             }
             
             <ReactTooltip />
