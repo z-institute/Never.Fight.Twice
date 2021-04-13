@@ -437,9 +437,9 @@ export class Dapp extends React.Component {
         tokenId: item.token_id
       })
     }
-
-    if(i===len-1){ // finish 
-      if(this.state.NFTs){
+      
+    }
+    if(this.state.NFTs){
         this.state.NFTs.filter(async function (nft) { 
           if(nft.openseaLink==='' && nft.nftContractName==='NFTSimple'){
             // let owner = await token.ownerOf(nft.tokenId)
@@ -457,9 +457,6 @@ export class Dapp extends React.Component {
        })
   
       }
-    }
-    }
-    
     console.log('updated NFTs')
     return NFTs
   }
