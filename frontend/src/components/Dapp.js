@@ -316,9 +316,7 @@ export class Dapp extends React.Component {
               NFTid_win: NFTid_win
             }
             this.openPopup(_title, _content)
-            alert(response)
-            // TODO: add win dialog
-            
+            // alert(response)
 
             
               }        
@@ -346,7 +344,7 @@ export class Dapp extends React.Component {
               NFTid_original: NFTid_original
             }
             this.openPopup(_title, _content)
-            alert(response)
+            // alert(response)
           }
         }
 

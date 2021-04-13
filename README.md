@@ -13,8 +13,8 @@ If the VRF coordinator returns an odd number, and there is at least one NFT in t
 
 ## Deployed Contracts
 ### Rinkeby
-- NeverFightTwice: [0xD27849DD2A2988549a66B10AAdB7E228ABdAed96](https://rinkeby.etherscan.io/address/0xD27849DD2A2988549a66B10AAdB7E228ABdAed96#code)
-- NFTSimple: [0x213a617024a535fa9ef19890FD420201DBcA02Af](https://rinkeby.etherscan.io/address/0x213a617024a535fa9ef19890FD420201DBcA02Af#code)
+- NeverFightTwice: [0xb54D0C3EC3Ebc1dA8feCEBcca3A41997047737Aa](https://rinkeby.etherscan.io/address/0xb54D0C3EC3Ebc1dA8feCEBcca3A41997047737Aa#code)
+- NFTSimple: [0xF57e31B9177Ed0Aa62d4A7e26cEAA1DF439C04fe](https://rinkeby.etherscan.io/address/0xF57e31B9177Ed0Aa62d4A7e26cEAA1DF439C04fe#code)
 
 ### Kovan
 - NeverFightTwice: [0x2DC272108F86832b59eb46ecfD5c117601d6b58e](https://kovan.etherscan.io/address/0x2DC272108F86832b59eb46ecfD5c117601d6b58e#code)
@@ -65,13 +65,13 @@ npx hardhat run scripts/deploy.js --network localhost
 // npx hardhat run scripts/deploy_kovan.js --network kovan
 // npx hardhat run scripts/deploy_matic.js --network maticTestnet
 ```
-5. Verify the contracts
+5. Verify the contracts (skip this if you have run `deploy_rinkeby.js`, it's already written in the script)
 ```
 // NeverFightTwice
-npx hardhat verify --network rinkeby 0xD27849DD2A2988549a66B10AAdB7E228ABdAed96 0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B 0x01be23585060835e02b77ef475b0cc51aa1e0709 0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311
+npx hardhat verify --network rinkeby 0xb54D0C3EC3Ebc1dA8feCEBcca3A41997047737Aa 0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B 0x01be23585060835e02b77ef475b0cc51aa1e0709 0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311
 
 // NFTSimple
-npx hardhat verify --network rinkeby 0x213a617024a535fa9ef19890FD420201DBcA02Af 
+npx hardhat verify --network rinkeby 0xF57e31B9177Ed0Aa62d4A7e26cEAA1DF439C04fe 
 
 // npx hardhat verify --network rinkeby DEPLOYED_CONTRACT_ADDRESS "Constructor argument 1" "Constructor argument 2"
 

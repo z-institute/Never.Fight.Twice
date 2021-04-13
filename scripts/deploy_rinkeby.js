@@ -58,6 +58,9 @@ async function main() {
     constructorArguments: [],
   })
 
+  // TODO: send LINK to NeverFightTwice
+
+
   // should mint NFT
   await nftSimple.batchMint(alice, 5); // tokenId = 0 to 9
 
