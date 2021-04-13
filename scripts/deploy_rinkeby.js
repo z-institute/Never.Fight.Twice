@@ -1,6 +1,8 @@
 const fs = require('fs');
 require("@nomiclabs/hardhat-web3") // web3
 require('dotenv').config()
+const hre = require("hardhat");
+var sleep = require('sleep');
 
 
 let neverFightTwice, nftSimple, link, accounts, alice
@@ -39,13 +41,30 @@ async function main() {
   console.log("NFTSimple", nftSimple.address);
   console.log("VRF", VRF_Coordinator_Addr);
 
-   // should mint NFT
-   await nftSimple.batchMint(alice, 10); // tokenId = 0 to 9
+  // wait for 30 seconds before verify
+  await sleep.sleep(30) 
 
-   let owner_0 = await nftSimple.ownerOf(0)
-   let owner_1 = await nftSimple.ownerOf(1)
-   let owner_9 = await nftSimple.ownerOf(9)
-   console.log("NFTs belong to", owner_0, owner_1, owner_9)
+  // verify contracts
+  await hre.run("verify:verify", {
+    address: neverFightTwice.address,
+    constructorArguments: [
+      "0xb3dCcb4Cf7a26f6cf6B120Cf5A73875B7BBc655B",
+      "0x01be23585060835e02b77ef475b0cc51aa1e0709",
+      "0x2ed0feb3e7fd2022120aa84fab1945545a9f2ffc9076fd6156fa96eaff4c1311",
+    ],
+  })
+  await hre.run("verify:verify", {
+    address: nftSimple.address,
+    constructorArguments: [],
+  })
+
+  // should mint NFT
+  await nftSimple.batchMint(alice, 5); // tokenId = 0 to 9
+
+  //  let owner_0 = await nftSimple.ownerOf(0)
+  //  let owner_1 = await nftSimple.ownerOf(1)
+  //  let owner_2 = await nftSimple.ownerOf(2)
+  //  console.log("NFTs belong to", owner_0, owner_1, owner_2)
 
   saveFrontendFiles();
 
