@@ -11,6 +11,9 @@ Send your NFT to the contract with your custom seed!
 ## How to win?
 If the VRF coordinator returns an odd number, and there is at least one NFT in the contract, the player wins. Otherwise, the player loses.
 
+## Live demo
+Head to http://www.neverfighttwice.com:3000/ to try the live demo.
+
 ## Deployed Contracts
 ### Rinkeby
 - NeverFightTwice: [0xb54D0C3EC3Ebc1dA8feCEBcca3A41997047737Aa](https://rinkeby.etherscan.io/address/0xb54D0C3EC3Ebc1dA8feCEBcca3A41997047737Aa#code)
@@ -85,6 +88,18 @@ npm install
 npm start
 ```
 9. Go to http://localhost:3000/ and connect your MetaMask wallet.
+
+## Production deployment
+Assuming the repo is cloned, [NPM]() and [PM2]() are installed, run the following script for **first** deployment
+```
+./firstdeploy.sh
+```
+
+Then everytime there is an update, update the app with:
+````
+./updatedeploy.sh
+```
+
 
 ## Notes 
 This project uses the template: https://github.com/pappas999/chainlink-hardhat-box
