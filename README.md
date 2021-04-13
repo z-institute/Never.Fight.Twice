@@ -92,6 +92,7 @@ npm start
 ## Production deployment
 Assuming the repo is cloned, [NPM]() and [PM2]() are installed, run the following script for **first** deployment
 ```
+chmod +x *deploy.sh
 ./firstdeploy.sh
 ```
 
