@@ -16,9 +16,9 @@
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "chai": "^4.2.0",
     "ethereum-waffle": "^3.2.1",
-    "ethers": "^5.0.24",
+    "ethers": "^5.1.0",
     "hardhat": "^2.0.6",
-    "hardhat-deploy": "^0.7.0-beta.39",
+    "hardhat-deploy": "^0.7.4",
     "web3": "^1.2.9"
   },
   "dependencies": {

@@ -87,7 +87,7 @@ npm start
 9. Go to http://localhost:3000/ and connect your MetaMask wallet.
 
 ## Notes 
-This project is modified from https://github.com/pappas999/chainlink-hardhat-box
+This project uses the template: https://github.com/pappas999/chainlink-hardhat-box
 
 ## TODO
 - Integrate IPFS

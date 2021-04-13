@@ -96,19 +96,19 @@ export class Dapp extends React.Component {
         <div className="row">
           <div className="col-12">
             <Popup
-              // _open={true}
-              // _title={'🎉 Congratulations! You Win!!! 🎊🥳'}
-              // _content={{
-              //   requestId: '98765894308076546',
-              //   randomNumber: '0987654356789087654',
-              //   NFTcontract_original: '0x09876547890',
-              //   NFTid_original: '9876543234567890876',
-              //   // NFTcontract_win: 'NFTcontract_win',
-              //   // NFTid_win: 'NFTid_win'
-              // }}
-              _open={this.state._popup}
-              _title={this.state._title}
-              _content={this.state._content}
+              _open={true}
+              _title={'🎉 Congratulations! You Win!!! 🎊🥳'}
+              _content={{
+                requestId: '98765894308076546',
+                randomNumber: '0987654356789087654',
+                NFTcontract_original: '0x09876547890',
+                NFTid_original: '9876543234567890876',
+                // NFTcontract_win: 'NFTcontract_win',
+                // NFTid_win: 'NFTid_win'
+              }}
+              // _open={this.state._popup}
+              // _title={this.state._title}
+              // _content={this.state._content}
             />
             <h1>
               {/* {this.state.tokenData.name} ({this.state.tokenData.symbol}) */}
