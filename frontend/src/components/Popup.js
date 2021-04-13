@@ -14,12 +14,15 @@ import ReactTooltip from 'react-tooltip';
 export function Popup({_open, _title, _content}) {
   const [open, setOpen] = React.useState(true);
 
-//   const handleClickOpen = () => {
-//     setOpen(true);
-//   };
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
 
   const handleClose = () => {
     setOpen(false);
+    setTimeout(() => {
+      setOpen(true)
+    }, 70000); 
   };
 
   const DialogActions = withStyles(theme => ({

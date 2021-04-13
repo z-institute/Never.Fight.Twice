@@ -279,6 +279,10 @@ export class Dapp extends React.Component {
   openPopup(_title, _content){
     this.setState({_title: _title, _content: _content, _popup: true})
     console.log('open popup')
+    // auto close after 1 minute
+    setTimeout(() => {
+      this.setState({_popup: false})
+    }, 60000);
   }
     async checkWinLose(){
         let logs = await this._provider.getLogs({address: this.neverFightTwice.address})
