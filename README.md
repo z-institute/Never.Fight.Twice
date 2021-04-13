@@ -90,16 +90,17 @@ npm start
 9. Go to http://localhost:3000/ and connect your MetaMask wallet.
 
 ## Production deployment
-Assuming the repo is cloned, [NPM]() and [PM2]() are installed, run the following script for **first** deployment
+Assuming the repo is cloned, [node.js](https://nodejs.org/en/) and [PM2](https://pm2.keymetrics.io/) are installed, run the following script for **first** deployment
 ```
 chmod +x *deploy.sh
 ./firstdeploy.sh
 ```
 
-Then everytime there is an update, update the app with:
+Then everytime there is an update, we can update the app with:
 ````
 ./updatedeploy.sh
 ```
+This script can be automated with tools such as `crontab`. The script will exit if tehre is no update.
 
 
 ## Notes 
