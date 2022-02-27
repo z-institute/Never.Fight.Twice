@@ -1,25 +1,43 @@
-import React, {useState } from "react";
-import {CopyToClipboard} from 'react-copy-to-clipboard';
-import Button from '@material-ui/core/Button';
+import Button from "@material-ui/core/Button";
+import React, { useState } from "react";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import { useSelector } from "react-redux";
+import { selectCount } from "../features/counter/counterSlice";
 
-export function Mint({mint,tokenSymbol,tokenContractAddr}){
+export function Mint({ mint, tokenSymbol, tokenContractAddr }) {
   const [copied, setCopied] = useState(false);
+  const count = useSelector(selectCount);
 
   return (
     <div>
-      <h4>Mint Some Free NFTs to Bet? 🤯</h4>
-      <span style={{color: 'gray'}}>Add <a href={'https://rinkeby.etherscan.io/address/'+tokenContractAddr} target='_blank'>NFTS</a>{" to MetaMask via Add Token > Custom Token and paste Token Contract Address. "} <CopyToClipboard text={tokenContractAddr}
+      <h4>Mint Some Free NFTs to Bet? 🤯 {count}</h4>
+      <span style={{ color: "gray" }}>
+        Add{" "}
+        <a
+          href={"https://rinkeby.etherscan.io/address/" + tokenContractAddr}
+          target="_blank"
+        >
+          NFTS
+        </a>
+        {
+          " to MetaMask via Add Token > Custom Token and paste Token Contract Address. "
+        }{" "}
+        <CopyToClipboard
+          text={tokenContractAddr}
           onCopy={() => {
-            setCopied(true)
-            setTimeout(()=>{
-              setCopied(false)
-            }, 2000)
-          }}>
-          <Button size="small" variant="contained" style={{color: 'grey'}}>Copy Address</Button>
-
+            setCopied(true);
+            setTimeout(() => {
+              setCopied(false);
+            }, 2000);
+          }}
+        >
+          <Button size="small" variant="contained" style={{ color: "grey" }}>
+            Copy Address
+          </Button>
         </CopyToClipboard>{" "}
-        {copied ? <span style={{color: 'black'}}>Copied!</span> : null}</span>
-      
+        {copied ? <span style={{ color: "black" }}>Copied!</span> : null}
+      </span>
+
       <form
         onSubmit={(event) => {
           // This function just calls the transferTokens callback with the
@@ -42,12 +60,12 @@ export function Mint({mint,tokenSymbol,tokenContractAddr}){
             name="number"
             placeholder="1"
             required
-            />
-            </div>
-            <div className="form-group">
-              <input className="btn btn-primary" type="submit" value="Mint!" />
-            </div>
-          </form>
+          />
+        </div>
+        <div className="form-group">
+          <input className="btn btn-primary" type="submit" value="Mint!" />
+        </div>
+      </form>
     </div>
   );
 }
